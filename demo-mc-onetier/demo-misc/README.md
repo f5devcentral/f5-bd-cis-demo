@@ -1,5 +1,5 @@
 # Overview of Routes deployed
-
+```
 [cloud-user@ocp-provisioner demo-tls-and-nontls]$ run-clusters.sh oc -n mc-onetier-eng-caas-nginx-app1 get route
 Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
 NAME                     HOST/PORT                                PATH   SERVICES     PORT   TERMINATION            WILDCARD
@@ -19,7 +19,7 @@ guestbook-app1   guestbook-app1.apps.f5-udf.com          guestbook-app1   3000  
 Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
 NAME             HOST/PORT                        PATH   SERVICES         PORT   TERMINATION     WILDCARD
 guestbook-app1   guestbook-app1.apps.f5-udf.com          guestbook-app1   3000   edge/Redirect   None
-
+```
 # Tests overview
 
 1. Test there is equitative load balancing
