@@ -1,6 +1,6 @@
 # Multi-cluster one tier demo
 
-The overall configuration can be found [here](https://clouddocs.f5.com/containers/latest/userguide/multicluster/)
+The documentation on CIS multi-cluster can be found [here](https://clouddocs.f5.com/containers/latest/userguide/multicluster/)
 
 ## Overview of the CIS deployment
 
