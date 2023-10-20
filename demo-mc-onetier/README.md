@@ -1,14 +1,14 @@
 # Multi-cluster one tier demo
 
-## Overvire of the CIS config
+The overall configuration can be found [here](https://clouddocs.f5.com/containers/latest/userguide/multicluster/)
+
+## Overview of the CIS deployment
 
 This is a multi-cluster demo which expectects a single kube config file with the contexts of all the clusters to be used.
 
-This demo has been used with two clusters with context names ocp1 and ocp2. The files in the cis-config folder will need 
-to be modified if these are different (probably it is easier to just create a replica of the context with these names).
+This demo is prepare for using two clusters with context names ocp1 and ocp2. The files in the cis-config folder will need to be modified if these are different (probably it is easier to just create a replica of the context with these names).
 
-The demo makes use of  bin/run-cluster.sh which is expected to be in the $PATH. Once copied somewhere in the $PATH, run run-cluster.sh 
-without arguments and follow the instructions.
+The demo makes use of  bin/run-cluster.sh which is expected to be in the $PATH. Once copied somewhere in the $PATH, run run-cluster.sh without arguments and follow the instructions.
 
 In a multi-cluster setup, there are two CIS instances (to provide HA) for each BIG-IP hence there are 4 Deployment files for the typical 2xBIG-IP cluster. The files in f5-bigip<id>-ctlr-deployment.clusterip.<cluster>.yaml need to be accomodated specifying IP addresses. The passwords are stored in a secret created from the cis-config/deploy-cis.sh script.
 
@@ -16,6 +16,41 @@ Also, in a multi-cluster setup CIS makes use of kubeconfig files stored as scret
 
 To deploy and undeploy CIS just run the deploy-cis.sh and undeploy-cis.sh without arguments from the base folder.
 
-## Overview of CIS config
+## Overview of the application level configuration
 
+This demo uses [NextGen Route](https://clouddocs.f5.com/containers/latest/userguide/next-gen-routes/), which is an extension of the regular OpenShift Route CRD. The extension is done by using ConfigMaps which extend the properties of the Route CRD.
+
+These ConfigMaps are global-cm.bigip1.yaml and global-cm.bigip2.yaml. These two ConfigMaps are equal with the exception of the primaryEndPoint attribute which is specific for each BIG-IP´s CIS. This attribute is used for the HA of CIS hence it has to be different.
+
+These ConfigMaps contain general settings such as multi-cluster ratios, the BIG-IP where the CIS configuration resides (multiple can be specified), the VIP listeners or the defaults for TLS profiles. Most of the settings in these files can be updated on the fly with oc apply. For your convinience, go to the cis-config folder and after editing run the ./update-configmaps.sh which will apply the changes to the two clusters where CIS is running.
+
+By default, the existing OpenShift Router will ingest the Route resources that we want the BIG-IP to implement. This doesn´t cause any problem but it is more clean to just avoid the OpenShift router to watch for the Routes that CIS is going to implement. A way to solve this is adding the following section to the default router:
+
+```
+run-clusters.sh oc edit -n openshift-ingress-operator ingresscontroller default
+```
+
+Adding the following
+```
+  namespaceSelector:
+    matchExpressions:
+    - key: router
+      operator: NotIn
+      values:
+      - bigip
+```
+which means that the namespaces that we don´t want the default router to watch need to have a `router: bigip` label.
+
+If this demo was built using F5 CRDs instead of Next Gen Routes this would not be needed.
+
+## Demos
+
+There are two demos:
+
+- demo-misc (formerly demo-tls-and-nontls): used to test miscelaneous features of multi-cluster using different TLS setups
+- demo-weights: used to test specifically routes with weights in a multi-cluster
+
+In each folder has two scripts create-demo.sh and delete-demo.sh for its setup and a README file with sample tests that can be done to verify the environment.
+
+At present, the two demos cannot be installed at the same time.
 
