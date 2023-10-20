@@ -188,21 +188,26 @@ In the persistence profile there is a setting named "Override Connection Limit" 
 9. Blue-green deployment
 
   > See demo-weights
+
 10. Change the ratio 80 to OCP1 and 20 to OCP2.
 
 Modify the global-cm accordantly
-
+```
 run-clusters.sh oc apply -f global-cm.yaml
-
+```
 Reset the stats:
 
+```
 tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
+```
 
 To verify
 
+```
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
+```
 
-11) Apply X-Forwarded-For
+11. Apply X-Forwarded-For
 
 apiVersion: cis.f5.com/v1
 kind: Policy
@@ -215,7 +220,7 @@ spec:
   profiles:
     http: /Common/http-x-forwarded-for
 
-Se puede aplicar un policy separado para tráfico no HTTPS, en la configuración disponible está aplicado a los dos
+The sample configuration the profile is applied to both HTTP and HTTPS traffic. It is possible to apply a different Policy CRD for the non HTTPS traffic.
 
 12) Define a cypher suite in a per route basis
 
@@ -235,12 +240,13 @@ metadata:
     virtual-server.f5.com/clientssl: /Common/clientssl-secure
 
 
-### Additional test
-
+### Additional tests
 
 Establish a keep alive connection and verify that this connection is not closed when scaling the Pods or setting ratio to 0
 
 Useful commands:
+
+```
 [cloud-user@ocp-provisioner cis-multicluster]$ oc -n  mc-onetier-eng-caas-nginx-app1 scale deployment nginx-app1 --replicas=1
 deployment.apps/nginx-app1 scaled
 [cloud-user@ocp-provisioner cis-multicluster]$ oc -n  mc-onetier-eng-caas-nginx-app1 scale deployment nginx-app1 --replicas=4
@@ -253,4 +259,5 @@ socat - OPENSSL:nginx-app1-passthrough.apps.f5-udf.com:443,verify=0
 GET / HTTP/1.1
 Host: something.apps.f5-udf.com
 
+```
 
