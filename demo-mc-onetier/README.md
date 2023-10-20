@@ -52,5 +52,5 @@ There are two demos:
 
 In each folder has two scripts create-demo.sh and delete-demo.sh for its setup and a README file with sample tests that can be done to verify the environment.
 
-At present, the two demos cannot be installed at the same time.
+At present, the two demos cannot be installed at the same time because it shares namespaces and Route names, feel free to modify if desired otherwise.
 
