@@ -1,0 +1,22 @@
+# sslProfiles in policy is applicable only to nextGen routes
+# CIS in custom resource mode will not process sslProfiles from policy
+# to configure ssl profiles in CRD mode, we recommend to use tls profiles
+apiVersion: cis.f5.com/v1
+kind: Policy
+metadata:
+  labels:
+    f5cr: "true"
+  name: policy-default
+  namespace: cis-mc-onetier
+spec:
+  poolSettings:
+    reselectTries: 10
+    serviceDownAction: reselect
+  profiles:
+    http: /Common/http-x-forwarded-for
+    persistenceProfile: none
+    sslProfiles:
+      clientProfiles:
+        - /Common/clientssl
+      serverProfiles:
+        - /Common/serverssl

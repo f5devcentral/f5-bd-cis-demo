@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shard-b
+  namespace: sc-twotier-shard-b
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shard-b
+  template:
+    metadata:
+      labels:
+        app: shard-b
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "Sharding Route B: www.sharded.com/shop"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shard-b
+  namespace: sc-twotier-shard-b
+  labels:
+    app: shard-b
+spec:
+  ports:
+  - name: shard-b-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: shard-b
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+  name: shard-b
+  namespace: sc-twotier-shard-b
+spec:
+  host: www.sharded.com 
+  path: /shop
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: shard-b
+    weight: 100
+  wildcardPolicy: None
+

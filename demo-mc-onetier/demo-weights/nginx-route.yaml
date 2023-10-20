@@ -1,0 +1,27 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: nginx-app1
+  namespace: mc-onetier-eng-caas-nginx-app1
+  labels:
+    app: nginx-app1
+    f5nr: "true"
+    f5type: mc-onetier
+  annotations:
+    virtual-server.f5.com/clientssl: /Common/clientssl-secure
+spec:
+  host: nginx-app1.apps.f5-udf.com
+  port:
+    targetPort: 8080
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: nginx-app1-v1
+    weight: 50
+  alternateBackends:
+  - kind: Service
+    name: nginx-app1-v2
+    weight: 50
+  wildcardPolicy: None

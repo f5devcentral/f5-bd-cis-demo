@@ -1,0 +1,19 @@
+{
+  "spec": {
+    "template": {
+      "spec": {
+        "containers": [
+          {
+            "name": "nginx",
+            "env": [
+              {
+                "name": "DUMMY",
+                "value": "test"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

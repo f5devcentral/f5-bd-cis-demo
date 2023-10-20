@@ -1,0 +1,20 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: mc-shard
+  namespace: openshift-ingress-operator
+spec:
+  clientTLS:
+  defaultCertificate:
+    name: router-shard-secret
+  domain: mc-sharded.com
+  endpointPublishingStrategy:
+    type: Private
+  namespaceSelector:
+    matchExpressions:
+    - key: router
+      operator: In
+      values:
+      - mc-shard
+  replicas: 1
+

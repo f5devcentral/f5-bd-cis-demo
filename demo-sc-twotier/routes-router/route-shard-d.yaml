@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shard-d
+  namespace: sc-twotier-shard-d
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shard-d
+  template:
+    metadata:
+      labels:
+        app: shard-d
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "Sharding Route D: account.sharded.com/"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shard-d
+  namespace: sc-twotier-shard-d
+  labels:
+    app: shard-d
+spec:
+  ports:
+  - name: shard-d-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: shard-d
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+  name: shard-d
+  namespace: sc-twotier-shard-d
+spec:
+  host: account.sharded.com 
+  path: /
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: shard-d
+    weight: 100
+  wildcardPolicy: None
+

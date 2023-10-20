@@ -1,0 +1,111 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-app1
+  namespace: mc-onetier-eng-caas-nginx-app1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-app1
+  template:
+    metadata:
+      labels:
+        app: nginx-app1
+    spec:
+      serviceAccountName: nginx
+      containers:
+      - name: nginx
+        image: docker.io/nginx:1.25.2
+        env:
+        - name: DUMMY
+          value: test
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 0
+        ports:
+        - containerPort: 8080
+        - containerPort: 8443
+        volumeMounts:
+        - name: nginx-html
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        - name: nginx-secret
+          mountPath: /etc/nginx/ssl
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-conf-app1
+      - name: nginx-html
+        configMap:
+          name: nginx-html-app1
+      - name: nginx-secret
+        secret:
+          secretName: nginx-app1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-app1
+  namespace: mc-onetier-eng-caas-nginx-app1
+spec:
+  selector:
+    app: nginx-app1
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 8443
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: nginx-app1
+  namespace: mc-onetier-eng-caas-nginx-app1
+  labels:
+    app: nginx-app1
+    f5nr: "true"
+    f5type: mc-onetier
+  annotations:
+    virtual-server.f5.com/clientssl: /Common/clientssl-secure
+spec:
+  host: nginx-app1.apps.f5-udf.com
+  port:
+    targetPort: 8080
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: nginx-app1
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: nginx-app1-passthrough
+  namespace: mc-onetier-eng-caas-nginx-app1
+  labels:
+    app: nginx-app1
+    f5nr: "true"
+    f5type: mc-onetier
+spec:
+  host: nginx-app1-passthrough.apps.f5-udf.com
+  port:
+    targetPort: 8443
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
+  to:
+    kind: Service
+    name: nginx-app1
+    weight: 100
+  wildcardPolicy: None

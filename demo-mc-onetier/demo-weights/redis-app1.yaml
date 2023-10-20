@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  namespace: eng-caas-guestbook-app1
+  labels:
+    app: redis-app1
+    role: master-app1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-app1
+      role: master-app1
+  template:
+    metadata:
+      labels:
+        app: redis-app1
+        role: master-app1
+    spec:
+      containers:
+      - name: redis-master
+        image: docker.io/redis:5.0.5
+        ports:
+        - name: redis-server
+          containerPort: 6379
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+      volumes:
+      - name: redis-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  namespace: eng-caas-guestbook-app1
+  labels:
+    app: redis-app1
+    role: master-app1
+spec:
+  ports:
+  - port: 6379
+    targetPort: redis-server
+  selector:
+    app: redis-app1
+    role: master-app1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-slave
+  namespace: eng-caas-guestbook-app1
+  labels:
+    app: redis-app1
+    role: slave-app1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis-app1
+      role: slave-app1
+  template:
+    metadata:
+      labels:
+        app: redis-app1
+        role: slave-app1
+    spec:
+      containers:
+      - name: redis-slave
+        image: docker.io/clouddragons/redis-slave:v1
+        ports:
+        - name: redis-server
+          containerPort: 6379
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+      volumes:
+      - name: redis-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-slave
+  namespace: eng-caas-guestbook-app1
+  labels:
+    app: redis-app1
+    role: slave-app1
+spec:
+  ports:
+  - port: 6379
+    targetPort: redis-server
+  selector:
+    app: redis-app1
+    role: slave-app1
+
+

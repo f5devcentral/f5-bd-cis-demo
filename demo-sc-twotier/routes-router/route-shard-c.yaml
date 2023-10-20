@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shard-c
+  namespace: sc-twotier-shard-c
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shard-c
+  template:
+    metadata:
+      labels:
+        app: shard-c
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "Sharding Route C: www.sharded.com/checkout"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shard-c
+  namespace: sc-twotier-shard-c
+  labels:
+    app: shard-c
+spec:
+  ports:
+  - name: shard-c-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: shard-c
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+  name: shard-c
+  namespace: sc-twotier-shard-c
+spec:
+  host: www.sharded.com 
+  path: /checkout
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: shard-c
+    weight: 100
+  wildcardPolicy: None
+

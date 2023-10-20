@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: f5-ipam-controller
+  name: f5-ipam-controller
+  namespace: cis-mc-onetier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5-ipam-controller
+  template:
+    metadata:
+      labels:
+        app: f5-ipam-controller
+    spec:
+      containers:
+      - args:
+        - --orchestration=kubernetes
+        - --ip-range='{"dev":"10.1.10.100-10.1.10.109","test":"10.1.10.110-10.1.10.119","prod":"10.1.10.120-10.1.10.129" }'
+        command:
+          - /app/bin/f5-ipam-controller
+        image: f5networks/f5-ipam-controller:latest
+        imagePullPolicy: IfNotPresent
+        name: f5-ipam-controller
+      serviceAccount: bigip-ctlr
+      serviceAccountName: bigip-ctlr

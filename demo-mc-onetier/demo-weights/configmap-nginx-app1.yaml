@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf-app1
+  namespace: mc-onetier-eng-caas-nginx-app1
+data:
+  default.conf: |
+    server {
+        listen 8080 default_server;
+        #listen [::]:80 default_server ipv6only=on;
+ 
+        listen 8443 ssl;
+ 
+        root /usr/share/nginx/html;
+        index index.html;
+ 
+        server_name localhost;
+        ssl_certificate /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+ 
+        location / {
+                try_files $uri $uri/ =404;
+        }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-html-app1
+  namespace: mc-onetier-eng-caas-nginx-app1
+data:
+  index.html: |
+    <html>
+      <head>
+        <title>CaaS nginx app1</title>
+      </head>
+      <body>
+        <h1> This is Deployment nginx app1 </h1>
+      </body>
+    </html>

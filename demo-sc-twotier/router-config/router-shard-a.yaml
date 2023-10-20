@@ -1,0 +1,20 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: shard-a
+  namespace: openshift-ingress-operator
+spec:
+  clientTLS:
+  defaultCertificate:
+    name: router-shard-secret
+  domain: shard-a.com
+  endpointPublishingStrategy:
+    type: Private
+  namespaceSelector:
+    matchExpressions:
+    - key: router
+      operator: In
+      values:
+      - shard-a
+  replicas: 1
+

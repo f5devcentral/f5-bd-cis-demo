@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-bigip2-ctlr-deployment
+  namespace: cis-mc-twotier
+spec:
+  # DO NOT INCREASE REPLICA COUNT
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-bigip2-ctlr-deployment
+  template:
+    metadata:
+      labels:
+        app: k8s-bigip2-ctlr-deployment
+    spec:
+      # Name of the Service Account bound to a Cluster Role with the required
+      # permissions
+      containers:
+        - name: k8s-bigip-ctlr
+          # securityContext:
+          #   allowPrivilegeEscalation: false
+          #   capabilities:
+          #     drop: ["ALL"]
+          #   runAsNonRoot: true
+          #   seccompProfile:
+          #     type: RuntimeDefault
+          # image: quay.io/f5networks/k8s-bigip-ctlr-devel:c20b620d3e972dd928f215552671bcb97b0b8eea
+          # image: quay.io/f5networks/k8s-bigip-ctlr-devel:6acfa932091c518f87d3d71070501dd68fcebf33
+          image: quay.io/f5networks/k8s-bigip-ctlr-devel:a5904e200bf11402611448289d6c864fc7427504
+          env:
+            - name: BIGIP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  # Replace with the name of the Secret containing your login
+                  # credentials
+                  name: bigip-login
+                  key: username
+            - name: BIGIP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # Replace with the name of the Secret containing your login
+                  # credentials
+                  name: bigip-login
+                  key: password
+          command: ["/app/bin/k8s-bigip-ctlr"]
+          args: [
+              "--bigip-username=$(BIGIP_USERNAME)",
+              "--bigip-password=$(BIGIP_PASSWORD)",
+              "--bigip-url=10.1.1.8",
+              "--namespace=openshift-ingress",
+              "--namespace=cis-mc-twotier-bigip2",
+              "--namespace=cis-mc-twotier",
+              "--bigip-partition=mc-twotier",
+              "--route-label=multicluster",
+              "--pool-member-type=cluster",
+              "--static-routing-mode=true",
+              "--shared-static-routes",
+              "--share-nodes",
+              "--multi-cluster-mode=primary",
+              "--log-level=AS3DEBUG",
+              "--insecure=true",
+              "--route-spec-configmap=cis-mc-twotier-bigip2/global-cm.bigip2",
+              "--controller-mode=openshift",
+              "--orchestration-cni=ovn-k8s",
+              "--as3-validation=true",
+              "--log-as3-response=true"
+          ]
+      serviceAccountName: bigip-ctlr
