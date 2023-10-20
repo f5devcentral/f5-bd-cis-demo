@@ -1,6 +1,4 @@
-run-clusters.sh ./create-demo.sh 
-
-### Overview of the workloads
+# Overview of Routes deployed
 
 [cloud-user@ocp-provisioner demo-tls-and-nontls]$ run-clusters.sh oc -n mc-onetier-eng-caas-nginx-app1 get route
 Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
@@ -22,39 +20,9 @@ Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
 NAME             HOST/PORT                        PATH   SERVICES         PORT   TERMINATION     WILDCARD
 guestbook-app1   guestbook-app1.apps.f5-udf.com          guestbook-app1   3000   edge/Redirect   None
 
-[cloud-user@ocp-provisioner base-config]$ run-clusters.sh oc -n mc-onetier-eng-caas-nginx-app1 get pods
-Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
-NAME                          READY   STATUS    RESTARTS   AGE
-nginx-app1-7f7b64bbbd-924d8   1/1     Running   0          30m
-nginx-app1-7f7b64bbbd-hmh8k   1/1     Running   0          30m
-Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
-NAME                          READY   STATUS    RESTARTS   AGE
-nginx-app1-7f7b64bbbd-7h459   1/1     Running   0          30m
-nginx-app1-7f7b64bbbd-wgzbz   1/1     Running   0          30m
-Switching back to initial context default/api-ocp1-f5-udf-com:6443/f5admin
-Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
+# Tests overview
 
-[cloud-user@ocp-provisioner base-config]$ run-clusters.sh oc -n mc-onetier-eng-caas-guestbook-app1 get pods
-Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
-NAME                              READY   STATUS    RESTARTS   AGE
-guestbook-app1-54cbc9b946-6sd76   1/1     Running   0          30m
-guestbook-app1-54cbc9b946-h6n4b   1/1     Running   0          30m
-guestbook-app1-54cbc9b946-j5rvf   1/1     Running   0          30m
-redis-master-d444d89cb-zvzr2      1/1     Running   0          30m
-redis-slave-644488cb4f-5z8ns      1/1     Running   0          30m
-redis-slave-644488cb4f-872tg      1/1     Running   0          30m
-Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
-NAME                              READY   STATUS    RESTARTS   AGE
-guestbook-app1-54cbc9b946-84j4p   1/1     Running   0          30m
-guestbook-app1-54cbc9b946-nlqf6   1/1     Running   0          30m
-guestbook-app1-54cbc9b946-t6svz   1/1     Running   0          30m
-redis-master-d444d89cb-d26bv      1/1     Running   0          30m
-redis-slave-644488cb4f-9xm99      1/1     Running   0          30m
-redis-slave-644488cb4f-p8rjm      1/1     Running   0          30m
-
-#####################################################################################################
-
-1)  Test there is equitative load balancing
+1. Test there is equitative load balancing
 
 Use the following commands
 
@@ -71,13 +39,15 @@ To reset the stats:
 
 tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
 
-2) Persistance test
+2. Persistance test
 
-Update the policy on the fly
+Update the policy on the fly (cis-config folder)
 
+```
 run-clusters.sh oc apply -f policy-persistence.yaml
+```
 
-Resetear las estadísticas
+To reset the stats
 
 tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
 
@@ -92,7 +62,7 @@ To verify
 
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
 
-Scale down the cluster where the requests went for https://nginx-app1.apps.f5-udf.com/
+Scale down the cluster where the requests went for https://nginx-app1.apps.f5-udf.com/ to verify that the requests no longer go where persistence was set
 
 use-cluster.sh ocp1
 
@@ -104,7 +74,9 @@ Verify again
 
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
 
-4) Readiness and Liveness probes / autoMonitor: service-endpoint
+3. Scale to zero an application
+
+4. Automatic end to end monitoring / autoMonitor: service-endpoint: Readiness, liveness and service endpoint probes
 
 - when probe is not defined, creates a TCP probe using 5 interval, 3x5+1 timeout by default
 - when probe is defined, creates a TCP probe using interval defined, 3xtimer+1 timeout
@@ -117,60 +89,68 @@ when autoMonitor is: service-endpoint, liveness-probe or readiness-probe
 
 https://github.com/F5Networks/k8s-bigip-ctlr/pull/3099/commits/b717d2f27c4abeb6a68126609fec839108ba51be
 
-5) Scale out an application while ab is running
+5. Scale out an application while ab is running
 
-Unset persistence
+Unset persistence for this test
 
 run-clusters.sh oc apply -f policy-default.yaml
 
-App Guestinfo shows some errors, plain nginx doesn´t and passthrough doesn´t: the errors are because of guestinfo unable to cope with the load
+Some tests shown App Guestinfo with some errors, plain nginx doesn´t and passthrough doesn´t: the errors are because of guestinfo unable to cope with the load
 
-### Commands for guestinfo test
+- Commands for guestinfo test
 
+```
 ab -n 50000 -c 20 https://guestbook-app1.apps.f5-udf.com/
 
 for r in 30 10 30 10; do echo $r ; oc -n mc-onetier-eng-caas-guestbook-app1 scale deployment guestbook-app1 --replicas=$r ; sleep 15 ; oc -n mc-onetier-eng-caas-guestbook-app1 get pods -l app=guestbook-app1 ; done
 oc -n mc-onetier-eng-caas-guestbook-app1 scale deployment guestbook-app1 --replicas=3
+```
 
+- Commands for nginx and nginx-passthrough tests
 
-### Commands for nginx and nginx-passthrough tests
-
+```
 ab -n 50000 -c 20 https://nginx-app1.apps.f5-udf.com/
 ab -n 50000 -c 20 https://nginx-app1-passthrough.apps.f5-udf.com/
-
 
 for r in 30 10 30 10; do echo $r ; oc -n mc-onetier-eng-caas-nginx-app1 scale deployment nginx-app1 --replicas=$r ; sleep 15 ; oc -n mc-onetier-eng-caas-nginx-app1 get pods ; done
 
 oc -n mc-onetier-eng-caas-nginx-app1 scale deployment nginx-app1 --replicas=3
+```
 
+6. Update an application when running ab
 
-6) Update an application when running ab
-
+```
 oc -n mc-onetier-eng-caas-nginx-app1 scale deployment nginx-app1 --replicas=30
-
+# make a dummy change
 oc -n mc-onetier-eng-caas-nginx-app1 patch deployment nginx-app1 --patch '{"spec":{"template":{"spec":{"containers": [{"name":"nginx","env": [{"name":"DUMMY","value":"test12"}]}]}}}}'
+```
 
+Workloads
+```
 ab -n 50000 -c 20 https://nginx-app1.apps.f5-udf.com/
-
 ab -n 50000 -c 20 https://nginx-app1-passthrough.apps.f5-udf.com/
+```
 
-
-7) Set cluster’s ratio to 0, while running ab
+7. Set cluster’s ratio to 0, while running ab
 
 Running ab -n 50000 -c 20 https://nginx-app1.apps.f5-udf.com/
 
 Verify
+```
 oc apply -f global-cm.yaml
-wait few secs, then reset the stat
+# wait few secs, then reset the stat
 tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
 then wait some more secs and show the stats
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
+```
 
-8) Connection limit
+8. Connection limit
 
-Set persistence to show how by default it is not overriden the connection limit
+Set persistence to show how by default it is not overriden the connection limit. 
 
+```
 run-clusters.sh oc apply -f policy-persistence.yaml
+```
 
 Set the connection limit
 
@@ -178,63 +158,35 @@ oc annotate -n mc-onetier-eng-caas-nginx-app1 route/nginx-app1 virtual-server.f5
 
 Have 10 pool members for each cluster
 
+```
 run-clusters.sh oc -n mc-onetier-eng-caas-nginx-app1 scale deployment nginx-app1 --replicas=10
+```
 
 Use this workload: 
 
+```
 ab -n 20000 -c 20 https://nginx-app1.apps.f5-udf.com/
+```
 
 To verify
 
+```
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
+```
 
 To reset the stats:
 
+```
 tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
-
+```
 Set persistence to show how by default it is not overriden the connection limit
 
-In the persistence profile there is a setting named "Override Connection Limit" but when using ratio or A/B load balancing this cannot be set (double checking)
+In the persistence profile there is a setting named "Override Connection Limit" but at present it cannot be applied. Let us know if this is required.
 
-9) Blue-green deployment
+9. Blue-green deployment
 
-Unset persistence to show distribution
-
-run-clusters.sh oc apply -f policy-default.yaml
-
-Note first delete demo-tls-and-nontls:
-
-run-clusters.sh ./delete-demo.sh
-
-Example in demo-weights.
-
-Create demo with route weights (uses only Edge termination)
-
-run-clusters.sh ./create-demo.sh
-
-Check routes and its distrution
-
-run-clusters.sh oc -n mc-onetier-eng-caas-nginx-app1 get route 
-
-Mandar tráfico y comprobar distribución
-
-ab -n 2000 -c 200 https://nginx-app1.apps.f5-udf.com/
-ab -n 2000 -c 200 https://nginx-app1-alt.apps.f5-udf.com/
-ab -n 2000 -c 200 https://nginx-app1.apps.f5-udf.com/test
-
-tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
-
-Change weights
-
-run-clusters.sh oc -n mc-onetier-eng-caas-nginx-app1 edit route nginx-app1
-
-Reset stats and repet the test
-
-tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
-
-Repeat using persistence
-
-10) Change the ratio 80 to OCP1 and 20 to OCP2.
+  > See demo-weights
+10. Change the ratio 80 to OCP1 and 20 to OCP2.
 
 Modify the global-cm accordantly
 
