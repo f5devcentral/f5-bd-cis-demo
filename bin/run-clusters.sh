@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -v $CLUSTER_LIST ]; then
+if [ -v "$CLUSTER_LIST" ]; then
 
 	echo Environment variable CLUSTER_LIST is undefined or empty.
 	echo
