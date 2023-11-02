@@ -9,5 +9,6 @@ for CLUSTER_ALIAS in ocp1 ocp2 ocp3; do
 	oc apply -f router-shard-secret.yaml
 	oc apply -f router-mc-shard.yaml
 
+	oc label ns openshift-ingress router=bigip
 done
 

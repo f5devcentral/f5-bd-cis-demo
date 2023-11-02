@@ -41,8 +41,12 @@ for CLUSTER_ALIAS in ocp1 ocp2; do
 		kubectl create secret generic -n cis-mc-twotier kubeconfig.$CLUSTER_ALIAS_INNER_LOOP --from-file=kubeconfig=kubeconfig.$CLUSTER_ALIAS_INNER_LOOP
 	done
 
-        oc apply -n cis-mc-twotier -f policy-default.yaml
+	oc create ns cis-mc-twotier
+	# are both label needed?
+	oc label ns cis-mc-twotier demo=sharded
         oc label ns cis-mc-twotier environment=test
+
+	oc apply -n cis-mc-twotier -f policy-default.yaml
 
 	# oc apply -f global-cm.yaml
 	oc apply -f global-cm.bigip1.yaml

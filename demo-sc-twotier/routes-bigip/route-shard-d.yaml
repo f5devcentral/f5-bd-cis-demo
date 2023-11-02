@@ -6,6 +6,18 @@ metadata:
     f5type: sharded
   name: shard-d
   namespace: openshift-ingress
+  annotations:
+    virtual-server.f5.com/health: |
+      [
+        {
+          "send": "GET / HTTP/1.0\r\nHost: account.sharded.com\r\n\r\n",
+          "recv": "^HTTP/1.0 200",
+          "interval": 5,
+          "timeout":  16,
+          "type": "https",
+          "sslProfile": "/Common/serverssl"
+        }
+      ]
 spec:
   host: account.sharded.com 
   path: /

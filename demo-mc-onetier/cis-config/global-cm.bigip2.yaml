@@ -8,7 +8,7 @@ metadata:
         f5nr: "true"
 data:
     extendedSpec: |
-      mode: ratio
+      mode: active-active
       highAvailabilityCIS:
         primaryEndPoint: http://10.1.10.5:31001/health
         probeInterval: 30

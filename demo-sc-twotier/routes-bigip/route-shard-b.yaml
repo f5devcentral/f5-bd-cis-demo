@@ -6,6 +6,18 @@ metadata:
     f5type: sharded
   name: shard-b
   namespace: openshift-ingress
+  annotations:
+    virtual-server.f5.com/health: |
+      [
+        {
+          "send": "GET /shop HTTP/1.0\r\nHost: www.sharded.com\r\n\r\n",
+          "recv": "^HTTP/1.0 200",
+          "interval": 5,
+          "timeout":  16,
+          "type": "https",
+          "sslProfile": "/Common/serverssl"
+        }
+      ]
 spec:
   host: www.sharded.com 
   path: /shop

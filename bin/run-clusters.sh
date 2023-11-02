@@ -1,10 +1,14 @@
 #!/bin/bash
 
 if [ -v $CLUSTER_LIST ]; then
-	echo Environment variable CLUSTER_LIST is undefined or empty
-	echo Need to specify a space separated list of clusters in CLUSTER_LIST environment variable.
+
+	echo Environment variable CLUSTER_LIST is undefined or empty.
 	echo
-	
+	echo It is need to specify a space separated list of clusters in CLUSTER_LIST environment variable.
+	echo
+	echo 'Example: export CLUSTER_LIST="ocp1 ocp2"'
+	echo
+
 	exit 1
 fi
 

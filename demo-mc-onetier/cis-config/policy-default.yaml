@@ -10,7 +10,7 @@ metadata:
   namespace: cis-mc-onetier
 spec:
   poolSettings:
-    reselectTries: 10
+    reselectTries: 0
     serviceDownAction: reselect
   profiles:
     http: /Common/http-x-forwarded-for

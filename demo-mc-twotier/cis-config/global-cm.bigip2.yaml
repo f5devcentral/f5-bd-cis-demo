@@ -1,20 +1,13 @@
 apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    demo: sharded
-  name: cis-mc-twotier-bigip2
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
     name: global-cm.bigip2
-    namespace: cis-mc-twotier-bigip2
+    namespace: cis-mc-twotier
     labels:
         f5nr: "true"
 data:
     extendedSpec: |
-      mode: ratio
+      mode: active-active
       highAvailabilityCIS:
         primaryEndPoint: http://10.1.10.5:30001/health
         probeInterval: 30

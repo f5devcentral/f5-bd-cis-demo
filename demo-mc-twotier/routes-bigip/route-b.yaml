@@ -8,6 +8,17 @@ metadata:
   namespace: openshift-ingress
   annotations:
     virtual-server.f5.com/multiClusterServices: '[ { "clusterName": "ocp3", "serviceName": "router-internal-mc-shard-b", "namespace": "openshift-ingress", "port": 443 } ]'
+    virtual-server.f5.com/health: |
+      [
+        {
+          "send": "GET /shop HTTP/1.0\r\nHost: www.mc-sharded.com\r\n\r\n",
+          "recv": "^HTTP/1.0 200",
+          "interval": 5,
+          "timeout":  16,
+          "type": "https",
+          "sslProfile": "/Common/serverssl"
+        }
+      ]
 spec:
   host: www.mc-sharded.com 
   path: /shop

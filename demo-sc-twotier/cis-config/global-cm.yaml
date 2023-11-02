@@ -16,8 +16,8 @@ data:
       extendedRouteSpec:
       - namespace: openshift-ingress
         vserverAddr: 10.1.10.103
-        vserverName: sharded
-        bigIpPartition: sharded
+        vserverName: sc-twotier
+        bigIpPartition: sc-twotier
         allowOverride: true
         policyCR: cis-sc-twotier/policy-default
 
