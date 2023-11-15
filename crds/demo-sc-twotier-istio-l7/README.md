@@ -4,10 +4,12 @@ Creates a single-cluster L7 two-tier deployment where Istio is the in-cluster in
 
 L7 routes created in Istio and in BIG-IP:
 
+```
 www.sc-istio.com/
 www.sc-istio.com/shop
 www.sc-istio.com/checkout
 account.sc-istio.com/
+```
 
 The configuration in the BIG-IP will be in the sc-twotier partition
 
