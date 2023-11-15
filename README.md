@@ -1,14 +1,8 @@
 # f5-bd-cis-demo
 
-This is a set of demos of CIS integrations for OpenShift using Next Generation Routes. It is split in folders for each type of architecture
+This is a set of demos of CIS integrations for OpenShift:
 
-- demo-sc-onetier: single cluster one tier deployment type (no demos at this time)
-- demo-sc-twotier: single cluster two tier deployment type
-- demo-mc-onetier: multiple cluster one tier deployment type
-- demo-mc-twotier: multiple cluster two twier deployment type
+CIS has operates either using OpenShift Routes (optionally using F5 NextGen Route augmentations) or using F5 CRDs which are clean sheet implementation.
 
-The folder bin contains scripts that are useful for deploying/running these demos.
-
-Each folder has its own description in a README file.
-
+Please check the route and crds folders respectively depending on the mode in which you want to use CIS. Each folder has its own description in a README file.
 

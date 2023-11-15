@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: f5-ipam-controller
+  name: f5-ipam-controller
+  namespace: cis-sc-twotier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5-ipam-controller
+  template:
+    metadata:
+      labels:
+        app: f5-ipam-controller
+    spec:
+      containers:
+      - args:
+        - --orchestration=openshift
+#     - --ip-range='{"Dev":"10.1.10.110-10.1.10.115","Test":"10.1.10.120-10.1.10.125","Production":"10.1.10.130-10.1.10.135","Default":"10.1.10.130-10.1.10.135"}'
+        - --ip-range 
+        - '{"Dev":"10.1.10.110-10.1.10.115"}'
+        - --log-level=DEBUG
+        command:
+        - /app/bin/f5-ipam-controller
+        image: f5devcentral/f5-ipam-controller:latest
+        imagePullPolicy: IfNotPresent
+        name: f5-ipam-controller
+      serviceAccount: ipam-ctlr
+      serviceAccountName: ipam-ctlr
+
