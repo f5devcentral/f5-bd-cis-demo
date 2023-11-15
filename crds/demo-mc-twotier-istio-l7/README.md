@@ -29,7 +29,7 @@ NAME                    HOST               TLSPROFILENAME      HTTPTRAFFIC   IPA
 virtualserver-route-a   www.mc-istio.com   reencrypt-tls-www                             test        10.1.10.110     Ok       10m
 virtualserver-route-b   www.mc-istio.com   reencrypt-tls-www                             test        10.1.10.110     Ok       10m
 virtualserver-route-c   www.mc-istio.com   reencrypt-tls-www                             test        10.1.10.110     Ok       10m
-virtualserver-route-d   account.mc-istio.com   reencrypt-tls-www                             test        10.1.10.110     Ok       10m
+virtualserver-route-d   account.mc-istio.com   reencrypt-tls-account                             test        10.1.10.110     Ok       10m
 ```
 
 Edit the DNS and restart dnsmasq:
