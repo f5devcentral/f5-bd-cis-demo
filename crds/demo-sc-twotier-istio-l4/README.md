@@ -1,15 +1,17 @@
 # Overview
 
-Creates a L4 two-tier deployment where Istio is the in-cluster ingress controller.
+Creates a L4 two-tier deployment where Istio is the second tier.
 
-L7 routes created in Istio, and these will mapped to the following VS in the BIG-IP:
+The L7 routes created in Istio are mapped into the following VS in the BIG-IP:
 
 ```
-www.sc-istio.com/         -> <IPAM address>:443
-www.sc-istio.com/shop     -> <IPAM address>:443
-www.sc-istio.com/checkout -> <IPAM address>:443
-account.sc-istio.com/     -> <IPAM address>:8443
+www.sc-istio.com/         -> www.sc-istio.com:443
+www.sc-istio.com/shop     -> www.sc-istio.com:443
+www.sc-istio.com/checkout -> www.sc-istio.com:443
+account.sc-istio.com/     -> account.sc-istio.com:8443
 ```
+
+Where www.sc-istio.com an account.sc-istio.com will use dynamically allocated addresses using the F5 IPAM controller and both FQDNs will be sharing the same IP address (because of the use of hostGroups).
 
 The configuration in the BIG-IP will be in the sc-twotier partition
 
