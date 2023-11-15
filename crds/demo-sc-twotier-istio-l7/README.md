@@ -1,6 +1,6 @@
 # Overview
 
-Creates a L7 two-tier deployment where Istio is the in-cluster ingress controller.
+Creates a single-cluster L7 two-tier deployment where Istio is the in-cluster ingress controller. It is recommended to switch to the ocp3 cluster for this demo.
 
 L7 routes created in Istio and in BIG-IP:
 
@@ -8,8 +8,6 @@ www.sc-istio.com/
 www.sc-istio.com/shop
 www.sc-istio.com/checkout
 account.sc-istio.com/
-
-At time of this writing I had a problem with account.sc-istio.com, not sure if it is a problem of my config but I reported in https://github.com/F5Networks/k8s-bigip-ctlr/issues/3145
 
 The configuration in the BIG-IP will be in the sc-twotier partition
 
@@ -29,6 +27,7 @@ NAME                    HOST               TLSPROFILENAME      HTTPTRAFFIC   IPA
 virtualserver-route-a   www.sc-istio.com   reencrypt-tls-www                             test        10.1.10.110     Ok       10m
 virtualserver-route-b   www.sc-istio.com   reencrypt-tls-www                             test        10.1.10.110     Ok       10m
 virtualserver-route-c   www.sc-istio.com   reencrypt-tls-www                             test        10.1.10.110     Ok       10m
+virtualserver-route-d   account.sc-istio.com   reencrypt-tls-account                             test        10.1.10.110     Ok       10m
 ```
 
 Edit the DNS and restart dnsmasq:
