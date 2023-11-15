@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  name: istio-ingressgateway-account
+  namespace: istio-system
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: http
+  - name: https
+    port: 8443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: istio-ingressgateway
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: cis.f5.com/v1
+kind: TransportServer
+metadata:
+  labels:
+    f5cr: "true"
+  name: transportserver-account
+  namespace: istio-system
+spec:
+  host: account.sc-istio.com
+  virtualServerPort: 8443
+  ipamLabel: test
+  hostGroup: sc-istio.com
+  mode: standard
+  pool:
+    service: istio-ingressgateway-account
+    servicePort: 8443
+    monitor:
+      interval: 5
+      timeout: 16
+      type: https
+      name: /Common/account.sc-istio.com
+      reference: bigip
+
+

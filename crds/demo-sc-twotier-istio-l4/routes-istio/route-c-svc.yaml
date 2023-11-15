@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: route-c
+  namespace: sc-istio
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: route-c
+  template:
+    metadata:
+      labels:
+        app: route-c
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "Two tier Route C: www.sc-istio.com/checkout"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: route-c
+  namespace: sc-istio
+  labels:
+    app: route-c
+spec:
+  ports:
+  - name: route-c-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: route-c
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+  name: route-c
+  namespace: sc-istio
+spec:
+  host: www.sc-istio.com 
+  path: /checkout
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: route-c
+    weight: 100
+  wildcardPolicy: None
+

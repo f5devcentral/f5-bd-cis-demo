@@ -1,0 +1,39 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: mc-istio-www
+  namespace: mc-istio
+spec:
+  hosts:
+  - www.mc-istio.com
+  gateways:
+  - mc-istio
+  http:
+  - name: shop
+    match:
+    - uri:
+        prefix: /shop
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: route-b
+  - name: checkout
+    match:
+    - uri:
+        prefix: /checkout
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: route-c
+  - name: root
+    match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: route-a
+

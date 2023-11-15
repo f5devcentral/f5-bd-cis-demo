@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: mc-istio
+  namespace: mc-istio
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - www.mc-istio.com
+    - account.mc-istio.com
+    tls:
+      mode: SIMPLE
+      credentialName: mc-istio-credential
+      cipherSuites: 
+      - AES256-SHA
+

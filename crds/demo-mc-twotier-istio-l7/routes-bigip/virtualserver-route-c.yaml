@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  name: svc-route-c
+  namespace: istio-system
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: http
+  - name: https
+    port: 8443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: istio-ingressgateway
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: "cis.f5.com/v1"
+kind: VirtualServer
+metadata:
+  name: virtualserver-route-c
+  namespace: istio-system
+  labels:
+    f5cr: "true"
+spec:
+  host: www.mc-istio.com
+  ipamLabel: test
+  hostGroup: mc-istio.com
+  tlsProfileName: reencrypt-tls-www
+  pools:
+  - path: /checkout
+    service: svc-route-c
+    servicePort: 8443
+    monitor:
+      interval: 5
+      timeout: 16
+      type: https
+      name: /Common/www.mc-istio.com-checkout
+      reference: bigip
+    extendedServiceReferences:
+    - clusterName: ocp2
+      namespace:  istio-system
+      port: 8443
+      serviceName: svc-route-c
+    - clusterName: ocp3
+      namespace: istio-system
+      port: 8443
+      serviceName: svc-route-c
+
+
