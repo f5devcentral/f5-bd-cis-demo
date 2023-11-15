@@ -4,10 +4,12 @@ Creates a multi-cluster L7 two-tier deployment with clusters ocp1 and ocp2, wher
 
 L7 routes created in Istio and in BIG-IP:
 
+```
 www.mc-istio.com/
 www.mc-istio.com/shop
 www.mc-istio.com/checkout
 account.sc-istio.com/
+```
 
 The configuration in the BIG-IP will be in the mc-twotier partition
 
