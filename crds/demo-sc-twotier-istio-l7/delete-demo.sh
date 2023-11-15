@@ -4,6 +4,6 @@
 
 (cd routes-istio ; ./delete-routes-istio.sh)
 
-(cd cis-config ; ./undeploy-cis.sh )
+(cd cis-config ; ./undeploy-cis.sh ; ./undeploy-ipam.sh )
 
 
