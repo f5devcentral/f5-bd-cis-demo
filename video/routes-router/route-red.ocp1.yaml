@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-red
+  namespace: applications
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app-red
+  template:
+    metadata:
+      labels:
+        app: app-red
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "cluster OCP1 / L7 route RED: www.multicluster.com/"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-red
+  namespace: applications
+  labels:
+    app: app-red
+spec:
+  ports:
+  - name: app-red-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: app-red
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: route-red
+  namespace: applications
+spec:
+  host: www.multicluster.com 
+  path: /
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: service-red
+    weight: 100
+  wildcardPolicy: None
+

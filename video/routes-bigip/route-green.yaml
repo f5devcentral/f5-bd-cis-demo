@@ -1,0 +1,27 @@
+apiVersion: "cis.f5.com/v1"
+kind: VirtualServer
+metadata:
+  name: route-green
+  namespace: openshift-ingress
+  labels:
+    f5cr: "true"
+spec:
+  host: www.multicluster.com
+  ipamLabel: test
+  hostGroup: multicluster.com
+  tlsProfileName: tls-reencrypt-www
+  policyName: oneconnect-policy
+  pools:
+  - path: /account
+    service: service-green
+    servicePort: 443
+    monitor:
+      type: https
+      name: /Common/www.multicluster.com
+      reference: bigip
+    extendedServiceReferences:
+    - clusterName: ocp3
+      namespace: openshift-ingress
+      serviceName: service-green
+      port: 443
+

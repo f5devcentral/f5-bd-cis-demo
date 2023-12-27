@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-blue
+  namespace: applications
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app-blue
+  template:
+    metadata:
+      labels:
+        app: app-blue
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "cluster OCP1 / L7 route BLUE: shop.multicluster.com/"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-blue
+  namespace: applications
+  labels:
+    app: app-blue
+spec:
+  ports:
+  - name: app-blue-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: app-blue
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: route-blue
+  namespace: applications
+spec:
+  host: shop.multicluster.com 
+  path: /
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: service-blue
+    weight: 100
+  wildcardPolicy: None
+
