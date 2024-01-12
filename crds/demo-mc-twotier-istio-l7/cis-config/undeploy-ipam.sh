@@ -1,10 +1,14 @@
 #!/bin/bash
 
+source deploy.cfg
+
 for CLUSTER_ALIAS in ocp1 ocp2; do
 
-        oc config use-context default/api-${CLUSTER_ALIAS}-f5-udf-com:6443/f5admin
-        oc login -u f5admin -p f5admin # the f5admin user has cluster-admin permissions
         echo ">>> Cluster ${CLUSTER_ALIAS}"
+
+        oc config use-context default/api-${CLUSTER_ALIAS}-f5-udf-com:6443/f5admin
+        oc login -u ${OCP_USER} -p ${OCP_PASS}
+
 
         helm -n cis-mc-twotier uninstall f5-ipam-controller
 
