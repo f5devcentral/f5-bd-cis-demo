@@ -1,6 +1,6 @@
 # Overview
 
-Creates a multi-cluster L7 two-tier deployment with clusters ocp1, ocp2 and ocp3, where Istio is in the second tier.
+Creates a multi-cluster L7 two-tier deployment with clusters ocp1 and ocp2, where Istio is in the second tier.
 
 L7 routes created in Istio and in BIG-IP:
 
@@ -8,32 +8,10 @@ L7 routes created in Istio and in BIG-IP:
 www.mc-istio.com/
 www.mc-istio.com/shop
 www.mc-istio.com/checkout
-account.mc-istio.com/
+account.sc-istio.com/
 ```
 
-In the second tier these virtualservice resources to expose the above L7 routes are in all clusters:
-```
-[cloud-user@ocp-provisioner routes-istio]$ run-clusters.sh oc -n mc-istio get virtualservice
-Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
-NAME               GATEWAYS       HOSTS                      AGE
-mc-istio-account   ["mc-istio"]   ["account.mc-istio.com"]   38s
-mc-istio-www       ["mc-istio"]   ["www.mc-istio.com"]       39s
-Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
-NAME               GATEWAYS       HOSTS                      AGE
-mc-istio-account   ["mc-istio"]   ["account.mc-istio.com"]   12m
-mc-istio-www       ["mc-istio"]   ["www.mc-istio.com"]       12m
-Switched to context "default/api-ocp3-f5-udf-com:6443/f5admin".
-NAME               GATEWAYS       HOSTS                      AGE
-mc-istio-account   ["mc-istio"]   ["account.mc-istio.com"]   26s
-mc-istio-www       ["mc-istio"]   ["www.mc-istio.com"]       26s
-Switching back to initial context default/api-ocp2-f5-udf-com:6443/f5admin
-Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
-```
-
-In the first tier, there is a 1:1 mapping between the L7 routes in the second tier (Istio) and a Service pointing to Istio for each L7 route:
-
-
-
+The configuration in the BIG-IP will be in the mc-twotier partition
 
 # Install and Run the demo
 
