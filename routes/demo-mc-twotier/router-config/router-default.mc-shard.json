@@ -6,10 +6,6 @@
                     "key": "router",
                     "operator": "NotIn",
                     "values": [
-			"shard-a",
-			"shard-b",
-			"shard-c",
-			"shard-d",
 			"mc-shard",
 			"bigip"
                     ]

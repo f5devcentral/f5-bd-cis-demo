@@ -1,0 +1,48 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: routes-www-account
+  namespace: mc-twotier
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+      - www.mc-nginx.com
+      - account.mc-nginx.com
+    secretName: mc-twotier-credential
+  rules:
+  - host: www.mc-nginx.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: route-a
+            port:
+              number: 8080
+      - path: /shop
+        pathType: Prefix
+        backend:
+          service:
+            name: route-b
+            port:
+              number: 8080
+      - path: /checkout
+        pathType: Prefix
+        backend:
+          service:
+            name: route-c
+            port:
+              number: 8080
+  - host: account.mc-nginx.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: route-d
+            port:
+              number: 8080
+

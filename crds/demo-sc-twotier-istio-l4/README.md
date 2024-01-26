@@ -2,18 +2,66 @@
 
 Creates a L4 two-tier deployment where Istio is the second tier.
 
-The L7 routes created in Istio are mapped into the following VS in the BIG-IP:
+The L7 routes created in Istio are the following:
 
 ```
-www.sc-istio.com/         -> www.sc-istio.com:443
-www.sc-istio.com/shop     -> www.sc-istio.com:443
-www.sc-istio.com/checkout -> www.sc-istio.com:443
-account.sc-istio.com/     -> account.sc-istio.com:8443
+www.sc-istio.com/
+www.sc-istio.com/shop
+www.sc-istio.com/checkout
+account.sc-istio.com/
 ```
 
-Where www.sc-istio.com an account.sc-istio.com will use dynamically allocated addresses using the F5 IPAM controller and both FQDNs will be sharing the same IP address (because of the use of hostGroups).
+These will be mapped into the following L4 TransportServers in the BIG-IP
+
+All L7 routes of FQDN www.sc-istio.com will be mapped in Transport server https://www.sc-istio.com
+The L7 route account.sc-istio.com will be mapped in the Transport server https://account.sc-istio.com:8443 (note the difference in port)
+
+Where www.sc-istio.com an account.sc-istio.com will use a dynamically allocated addresses using the F5 IPAM controller and both FQDNs will be sharing the same IP address (because of the use of hostGroups).
 
 The configuration in the BIG-IP will be in the sc-twotier partition
+
+# Prerequisites
+
+It is needed to pre-create a server-side SSL profile with SNI for the following domains: www.sc-istio.com and account.sc-istio.com
+
+It is needed to pre-create an HTTPs monitors using these server-side SSL profiles for the L7 above.
+
+These configurations are shown next
+
+```
+ltm profile server-ssl www.sc-istio.com {
+    app-service none
+    defaults-from serverssl
+    server-name www.sc-istio.com
+    sni-default true
+}
+ltm profile server-ssl account.sc-istio.com {
+    app-service none
+    defaults-from serverssl
+    server-name account.sc-istio.com
+}
+ltm monitor https www.sc-istio.com {
+    defaults-from https
+    recv "^HTTP/1.1 200"
+    send "GET / HTTP/1.1\r\nHost: www.sc-istio.com\r\nConnection: close\r\n\r\n"
+    ssl-profile /Common/www.sc-istio.com
+}
+ltm monitor https www.sc-istio.com-shop {
+    recv "^HTTP/1.1 200"
+    send "GET /shop HTTP/1.1\r\nHost: www.sc-istio.com\r\nConnection: close\r\n\r\n"
+    ssl-profile /Common/www.sc-istio.com
+}
+ltm monitor https www.sc-istio.com-checkout {
+    recv "^HTTP/1.1 200"
+    send "GET /checkout HTTP/1.1\r\nHost: www.sc-istio.com\r\nConnection: close\r\n\r\n"
+    ssl-profile /Common/www.sc-istio.com
+}
+ltm monitor https account.sc-istio.com {
+    recv "^HTTP/1.1 200"
+    send "GET / HTTP/1.1\r\nHost: account.sc-istio.com\r\nConnection: close\r\n\r\n"
+    ssl-profile /Common/account.sc-istio.com
+}
+```
 
 # Install and Run the demo
 
@@ -35,7 +83,7 @@ transportserver-www                              443                 istio-ingre
 Edit the DNS and restart dnsmasq:
 
 ```
-$ sudo vi /etc/dnsmasq.d/sc-istio.com.conf 
+$ sudo bash -c 'echo "address=/sc-istio.com/10.1.10.110" > /etc/dnsmasq.d/sc-istio.com.conf'
 $ sudo systemctl restart dnsmasq
 ```
 

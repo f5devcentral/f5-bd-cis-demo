@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: mc-istio
-  namespace: mc-istio
+  namespace: mc-twotier
 spec:
   selector:
     app: istio-ingressgateway

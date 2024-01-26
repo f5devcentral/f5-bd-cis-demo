@@ -1,0 +1,26 @@
+apiVersion: "cis.f5.com/v1"
+kind: VirtualServer
+metadata:
+  name: virtualserver-route-a
+  namespace: nginx-ingress
+  labels:
+    f5cr: "true"
+spec:
+  host: www.mc-nginx.com
+  ipamLabel: test
+  hostGroup: mc-nginx.com
+  tlsProfileName: reencrypt-tls-www
+  pools:
+  - path: /
+    servicePort: 443
+    service: svc-route-a
+    monitor:
+      type: https
+      name: /Common/www.mc-nginx.com
+      reference: bigip
+    extendedServiceReferences:
+    - clusterName: ocp3
+      namespace: nginx-ingress
+      port: 443
+      serviceName: svc-route-a
+
