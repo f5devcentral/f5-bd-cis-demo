@@ -25,9 +25,8 @@ spec:
           #   runAsNonRoot: true
           #   seccompProfile:
           #     type: RuntimeDefault
-          # image: quay.io/f5networks/k8s-bigip-ctlr-devel:c20b620d3e972dd928f215552671bcb97b0b8eea
-          # image: quay.io/f5networks/k8s-bigip-ctlr-devel:6acfa932091c518f87d3d71070501dd68fcebf33
-          image: quay.io/f5networks/k8s-bigip-ctlr-devel:a5904e200bf11402611448289d6c864fc7427504
+          image: registry.connect.redhat.com/f5networks/cntr-ingress-svcs:latest
+          # image: quay.io/f5networks/k8s-bigip-ctlr-devel:a5904e200bf11402611448289d6c864fc7427504
           env:
             - name: BIGIP_USERNAME
               valueFrom:
@@ -59,8 +58,8 @@ spec:
               "--log-level=AS3DEBUG",
               "--insecure=true",
               "--custom-resource-mode=true",
-              "--extended-spec-configmap=cis-mc-twotier/global-cm.bigip2",
               "--ipam=true",
+              "--extended-spec-configmap=cis-mc-twotier/global-cm.bigip2",
               "--orchestration-cni=ovn-k8s",
               "--as3-validation=true",
               "--log-as3-response=true"

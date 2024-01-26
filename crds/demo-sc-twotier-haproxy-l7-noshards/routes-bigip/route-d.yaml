@@ -1,0 +1,21 @@
+apiVersion: "cis.f5.com/v1"
+kind: VirtualServer
+metadata:
+  name: route-d
+  namespace: openshift-ingress
+  labels:
+    f5cr: "true"
+spec:
+  host: account.sc-twotier.com
+  hostGroup: sc-twotier.com
+  virtualServerAddress: "10.1.10.104"
+  tlsProfileName: reencrypt-tls
+  pools:
+  - path: /
+    service: router-default-route-d
+    servicePort: 443
+    monitor:
+      type: https
+      name: /Common/account.sc-twotier.com
+      reference: bigip
+

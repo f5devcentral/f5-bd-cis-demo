@@ -1,0 +1,8 @@
+#!/bin/bash
+
+(cd routes-bigip ; CLUSTER_LIST="ocp1 ocp2" run-clusters.sh ./delete-routes-bigip.sh)
+(cd routes-bigip ; CLUSTER_LIST="ocp1 ocp2 ocp3" run-clusters.sh ./delete-services-bigip.sh)
+
+(cd routes-nginx ; CLUSTER_LIST="ocp1 ocp2 ocp3" run-clusters.sh ./delete-routes-nginx.sh)
+
+(cd cis-config ; ./undeploy-ipam.sh ; ./undeploy-cis.sh)

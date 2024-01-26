@@ -40,8 +40,6 @@ spec:
     service: istio-ingressgateway-www
     servicePort: 8443
     monitor:
-      interval: 5
-      timeout: 16
       type: https
       name: /Common/www.sc-istio.com
       reference: bigip

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: route-b
+  namespace: mc-twotier
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: route-b
+  template:
+    metadata:
+      labels:
+        app: route-b
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "Two tier Route B in OCP2: www.mc-istio.com/shop"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: route-b
+  namespace: mc-twotier
+  labels:
+    app: route-b
+spec:
+  ports:
+  - name: route-b-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: route-b
+---

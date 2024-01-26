@@ -28,18 +28,24 @@ guestbook-app1   guestbook-app1.apps.f5-udf.com          guestbook-app1   3000  
 
 Use the following commands
 
+```
 ab -n 10000 -c 20 https://nginx-app1.apps.f5-udf.com/
 ab -n 10000 -c 20 https://nginx-app1-passthrough.apps.f5-udf.com/
 
 ab -n 10000 -c 20 https://guestbook-app1.apps.f5-udf.com/
+```
 
 To verify
 
+```
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
+```
 
 To reset the stats:
 
+```
 tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
+```
 
 2. Persistance test
 
@@ -51,30 +57,40 @@ run-clusters.sh oc apply -f policy-persistence.yaml
 
 To reset the stats
 
+```
 tmsh -c "cd /mc-onetier/Shared/ ; reset-stats ltm pool members"
+```
 
 Re-run the tests
 
+```
 ab -n 10000 -c 20 https://nginx-app1.apps.f5-udf.com/
 ab -n 10000 -c 20 https://nginx-app1-passthrough.apps.f5-udf.com/
 
 ab -n 10000 -c 20 https://guestbook-app1.apps.f5-udf.com/
+```
 
 To verify
 
+```
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
+```
 
 Scale down the cluster where the requests went for https://nginx-app1.apps.f5-udf.com/ to verify that the requests no longer go where persistence was set
 
+```
 use-cluster.sh ocp1
 
 oc -n mc-onetier-eng-caas-nginx-app1 scale deployment nginx-app1 --replicas=0
 
 ab -n 20000 -c 20 https://nginx-app1.apps.f5-udf.com/
+```
 
 Verify again
 
+```
 tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Pool|Total"
+```
 
 3. Scale to zero an application
 
@@ -95,7 +111,9 @@ https://github.com/F5Networks/k8s-bigip-ctlr/pull/3099/commits/b717d2f27c4abeb6a
 
 Unset persistence for this test
 
+```
 run-clusters.sh oc apply -f policy-default.yaml
+```
 
 Some tests shown App Guestinfo with some errors, plain nginx doesn´t and passthrough doesn´t: the errors are because of guestinfo unable to cope with the load
 
@@ -156,7 +174,9 @@ run-clusters.sh oc apply -f policy-persistence.yaml
 
 Set the connection limit
 
+```
 oc annotate -n mc-onetier-eng-caas-nginx-app1 route/nginx-app1 virtual-server.f5.com/pod-concurrent-connections=10
+```
 
 Have 10 pool members for each cluster
 
@@ -209,6 +229,7 @@ tmsh -c "cd /mc-onetier ; show ltm pool recursive members raw" | egrep "Ltm::Poo
 
 11. Apply X-Forwarded-For
 
+```
 apiVersion: cis.f5.com/v1
 kind: Policy
 metadata:
@@ -219,6 +240,7 @@ metadata:
 spec:
   profiles:
     http: /Common/http-x-forwarded-for
+```
 
 The sample configuration the profile is applied to both HTTP and HTTPS traffic. It is possible to apply a different Policy CRD for the non HTTPS traffic.
 
@@ -226,6 +248,7 @@ The sample configuration the profile is applied to both HTTP and HTTPS traffic. 
 
 It can be specified a full SSL profile in a per route basis, which includes the cypher suite
 
+```
 [cloud-user@ocp-provisioner demo-weights]$ cat nginx-route.yaml 
 apiVersion: route.openshift.io/v1
 kind: Route
@@ -238,7 +261,7 @@ metadata:
     f5type: multicluster
   annotations:
     virtual-server.f5.com/clientssl: /Common/clientssl-secure
-
+```
 
 ### Additional tests
 

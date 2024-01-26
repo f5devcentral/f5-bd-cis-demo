@@ -14,17 +14,16 @@ metadata:
           "recv": "^HTTP/1.0 200",
           "interval": 5,
           "timeout":  16,
-          "type": "https",
-          "sslProfile": "/Common/serverssl"
+          "type": "http"
         }
       ]
 spec:
   host: account.sharded.com 
   path: /
   port:
-    targetPort: 443
+    targetPort: 80
   tls:
-    termination: reencrypt
+    termination: edge
   to:
     kind: Service
     name: router-internal-shard-d

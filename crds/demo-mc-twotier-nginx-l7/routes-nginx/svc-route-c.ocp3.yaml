@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: route-c
+  namespace: mc-twotier
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: route-c
+  template:
+    metadata:
+      labels:
+        app: route-c
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "Two tier Route C in OCP3: www.mc-nginx.com/checkout"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: route-c
+  namespace: mc-twotier
+  labels:
+    app: route-c
+spec:
+  ports:
+  - name: route-c-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: route-c
+

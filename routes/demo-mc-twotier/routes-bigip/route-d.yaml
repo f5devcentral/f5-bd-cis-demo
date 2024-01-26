@@ -4,8 +4,10 @@ metadata:
   labels:
     f5nr: "true"
     f5type: multicluster
+  name: mc-shard-d
+  namespace: openshift-ingress
   annotations:
-    virtual-server.f5.com/multiClusterServices: '[ { "clusterName": "ocp3", "serviceName": "router-internal-mc-shard-d", "namespace": "openshift-ingress", "port": 443 } ]'
+    virtual-server.f5.com/multiClusterServices: '[ { "clusterName": "ocp3", "serviceName": "router-internal-mc-shard-d", "namespace": "openshift-ingress", "port": 80 } ]'
     virtual-server.f5.com/health: |
       [
         {
@@ -13,19 +15,16 @@ metadata:
           "recv": "^HTTP/1.0 200",
           "interval": 5,
           "timeout":  16,
-          "type": "https",
-          "sslProfile": "/Common/serverssl"
+          "type": "http"
         }
       ]
-  name: mc-shard-d
-  namespace: openshift-ingress
 spec:
   host: account.mc-sharded.com 
   path: /
   port:
-    targetPort: 443
+    targetPort: 80
   tls:
-    termination: reencrypt
+    termination: edge
   to:
     kind: Service
     name: router-internal-mc-shard-d

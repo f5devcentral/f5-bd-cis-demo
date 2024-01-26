@@ -1,5 +1,6 @@
 #!/bin/bash
 
-oc delete ns mc-istio
+kubectl delete -n istio-system secret mc-istio-credential
+oc delete ns mc-twotier
 
 
