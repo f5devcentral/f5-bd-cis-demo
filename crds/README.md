@@ -12,6 +12,8 @@
   
 - demo-sc-twotier-istio-l7: single-cluster Layer 7 two-tier demo using Istio ingress gateway in the second tier.
 
+- demo-mc-twotier-haproxy-noshards: multi-cluster Layer 7 two-tier demo using HA-proxy in the second tier in NodePort mode
+
 Each demo has it´s own README file.
 
 
