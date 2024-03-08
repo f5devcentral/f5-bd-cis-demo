@@ -138,8 +138,6 @@ $ sudo bash -c 'echo "address=/migration.com/10.1.10.106" > /etc/dnsmasq.d/migra
 $ sudo systemctl restart dnsmasq
 ```
 
-And run the ./test-demo.sh to verify the deployment works as expected
-
 # Delete the demo
 
 Run the script ./delete-demo.sh
