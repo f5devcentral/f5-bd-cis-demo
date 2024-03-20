@@ -4,6 +4,8 @@
 
 (cd routes-router ; ./delete-routes-router.sh)
 
+(cd cis-config ; ./undeploy-ipam.sh )
+
 (cd cis-config ; ./undeploy-cis.sh )
 
 

@@ -21,5 +21,7 @@ spec:
       weight: 50
     monitor:
       type: https
-      name: /Common/www.migration.com-checkout
-      reference: bigip
+      send: "GET /checkout HTTP/1.1\r\nHost: www.migration.com\r\nConnection: close\r\n\r\n"
+      recv: "^HTTP/1.1 200"
+      interval: 5
+      timeout: 16

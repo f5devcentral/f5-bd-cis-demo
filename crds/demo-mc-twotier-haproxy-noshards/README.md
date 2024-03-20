@@ -17,48 +17,6 @@ In the second tier (HA-proxy), these L7 routes are exposed with the Route resour
 
 In the first tier (BIG-IP), these same L7 routes are exposed with the VirtualServer resource type. That is, there is a 1:1 mapping between the L7 routes in the first and second tier. There is one Service definition for each L7 route in the second tier, where the service definition is the same selecting always to the same Istio instances, but with diferent names for each Service. These duplicated Service definitions allow to have a separate pool for each L7 route and per service monitoring.
 
-# Prerequisites
-
-It is needed to pre-create a server-side SSL profile with SNI for the following domains: www.migration.com and account.migration.com
-
-It is needed to pre-create an HTTPs monitors using these server-side SSL profiles for the L7 above.
-
-These configurations are shown next
-
-```
-ltm profile server-ssl www.migration.com {
-    app-service none
-    defaults-from serverssl
-    server-name www.migration.com
-    sni-default true
-}
-ltm profile server-ssl account.migration.com {
-    app-service none
-    defaults-from serverssl
-    server-name account.migration.com
-}
-ltm monitor https www.migration.com {
-    defaults-from https
-    recv "^HTTP/1.1 200"
-    send "GET / HTTP/1.1\r\nHost: www.migration.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/www.migration.com
-}
-ltm monitor https www.migration.com-shop {
-    recv "^HTTP/1.1 200"
-    send "GET /shop HTTP/1.1\r\nHost: www.migration.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/www.migration.com
-}
-ltm monitor https www.migration.com-checkout {
-    recv "^HTTP/1.1 200"
-    send "GET /checkout HTTP/1.1\r\nHost: www.migration.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/www.migration.com
-}
-ltm monitor https account.migration.com {
-    recv "^HTTP/1.1 200"
-    send "GET / HTTP/1.1\r\nHost: account.migration.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/account.migration.com
-}
-```
 
 # Install and Run the demo
 

@@ -22,6 +22,9 @@ spec:
       weight: 50
     monitor:
       type: https
-      name: /Common/account.migration.com
-      reference: bigip
+      send: "GET / HTTP/1.1\r\nHost: account.migration.com\r\nConnection: close\r\n\r\n"
+      recv: "^HTTP/1.1 200"
+      interval: 5
+      timeout: 16
+
 

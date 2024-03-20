@@ -17,53 +17,6 @@ In the first tier (BIG-IP), these same L7 routes are exposed with the VirtualSer
 
 The L7 routes are exposed in both BIG-IP and HA-proxy as HTTPS only
 
-# Prerequisites
-
-It is needed to pre-create the HA-proxy shard (named shard-apps):
-- Run the script ./create-shards.sh and wait several minutes until both the default shard and the shard shard-apps is READY
-- To undo this change, run the command ./delete-shards.sh
-
-It is needed to pre-create a server-side SSL profile with SNI for the following domains: www.sc-twotier.com and account.sc-twotier.com
-
-It is needed to pre-create an HTTPs monitors using these server-side SSL profiles for the L7 above. 
-
-These configurations are shown next
-
-```
-ltm profile server-ssl www.sc-twotier.com {
-    app-service none
-    defaults-from serverssl
-    server-name www.sc-twotier.com
-    sni-default true
-}
-ltm profile server-ssl account.sc-twotier.com {
-    app-service none
-    defaults-from serverssl
-    server-name account.sc-twotier.com
-}
-ltm monitor https www.sc-twotier.com {
-    defaults-from https
-    recv "^HTTP/1.1 200"
-    send "GET / HTTP/1.1\r\nHost: www.sc-twotier.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/www.sc-twotier.com
-}
-ltm monitor https www.sc-twotier.com-shop {
-    recv "^HTTP/1.1 200"
-    send "GET /shop HTTP/1.1\r\nHost: www.sc-twotier.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/www.sc-twotier.com
-}
-ltm monitor https www.sc-twotier.com-checkout {
-    recv "^HTTP/1.1 200"
-    send "GET /checkout HTTP/1.1\r\nHost: www.sc-twotier.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/www.sc-twotier.com
-}
-ltm monitor https account.sc-twotier.com {
-    recv "^HTTP/1.1 200"
-    send "GET / HTTP/1.1\r\nHost: account.sc-twotier.com\r\nConnection: close\r\n\r\n"
-    ssl-profile /Common/account.sc-twotier.com
-}
-```
-
 # Install and Run the demo
 
 Run the script ./create-demo.sh which will:
