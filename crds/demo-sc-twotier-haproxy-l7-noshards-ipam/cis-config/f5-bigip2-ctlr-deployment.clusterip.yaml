@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-bigip2-ctlr-deployment
+  namespace: cis-sc-twotier
+spec:
+  # DO NOT INCREASE REPLICA COUNT
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-bigip2-ctlr-deployment
+  template:
+    metadata:
+      labels:
+        app: k8s-bigip2-ctlr-deployment
+    spec:
+      # Name of the Service Account bound to a Cluster Role with the required
+      # permissions
+      containers:
+        - name: k8s-bigip-ctlr
+          # securityContext:
+          #   allowPrivilegeEscalation: false
+          #   capabilities:
+          #     drop: ["ALL"]
+          #   runAsNonRoot: true
+          #   seccompProfile:
+          #     type: RuntimeDefault
+          image: registry.connect.redhat.com/f5networks/cntr-ingress-svcs:latest
+          env:
+            - name: BIGIP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  # Replace with the name of the Secret containing your login
+                  # credentials
+                  name: bigip-login
+                  key: username
+            - name: BIGIP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # Replace with the name of the Secret containing your login
+                  # credentials
+                  name: bigip-login
+                  key: password
+          command: ["/app/bin/k8s-bigip-ctlr"]
+          args: [
+              "--bigip-username=$(BIGIP_USERNAME)",
+              "--bigip-password=$(BIGIP_PASSWORD)",
+              "--bigip-url=10.1.1.8",
+              "--ipam=true",
+              "--namespace=openshift-ingress",
+              "--bigip-partition=sc-twotier",
+              "--pool-member-type=cluster",
+              "--share-nodes=true",
+              "--log-level=INFO",
+              "--insecure=true",
+              "--custom-resource-mode=true",
+              "--orchestration-cni=ovn-k8s",
+              "--as3-validation=true",
+              "--log-as3-response=true"
+          ]
+      serviceAccountName: bigip-ctlr
