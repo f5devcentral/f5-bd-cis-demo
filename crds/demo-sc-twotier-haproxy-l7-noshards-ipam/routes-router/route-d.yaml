@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: route-d
+  namespace: sc-twotier
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: route-d
+  template:
+    metadata:
+      labels:
+        app: route-d
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift
+        env:
+        - name: RESPONSE
+          value: "Two tier Route D: account.sc-twotier.com/"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumemounts:
+        - name: tmp
+          mountpath: "/tmp"
+        terminationmessagepath: "/dev/termination-log"
+        imagepullpolicy: ifnotpresent
+        securitycontext:
+          capabilities: {}
+          privileged: false
+      volumes:
+      - name: tmp
+        emptydir: {}
+      restartpolicy: always
+      dnspolicy: clusterfirst
+      Serviceaccount: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: route-d
+  namespace: sc-twotier
+  labels:
+    app: route-d
+spec:
+  ports:
+  - name: route-d-svc
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: route-d
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+  name: route-d
+  namespace: sc-twotier
+spec:
+  host: account.sc-twotier.com 
+  path: /
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: route-d
+    weight: 100
+  wildcardPolicy: None
+
