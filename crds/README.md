@@ -8,6 +8,8 @@
 
 - demo-sc-twotier-haproxy-l7-noshards: analogous to the previous demo but using the default OpenShift's router instance.
 
+- demo-sc-twotier-haproxy-l7-noshards-ipam: just like demo-sc-twotier-haproxy-l7-noshards but with IPAM support
+
 - demo-sc-twotier-istio-l4: single-cluster Layer 4 two-tier demo using Istio ingress gateway in the second tier.
   
 - demo-sc-twotier-istio-l7: single-cluster Layer 7 two-tier demo using Istio ingress gateway in the second tier.

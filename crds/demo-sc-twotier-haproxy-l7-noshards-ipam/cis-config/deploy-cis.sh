@@ -11,7 +11,7 @@ kubectl create -f https://raw.githubusercontent.com/F5Networks/k8s-bigip-ctlr/ma
 
 oc create secret generic bigip-login --namespace cis-sc-twotier --from-literal=username=admin --from-literal=password=OpenShiftMC
 
-for BIGIP in 1; do
+for BIGIP in 1 2; do
 
 	oc apply -f f5-bigip${BIGIP}-ctlr-deployment.${POOLMEMBER_TYPE}.yaml 
 done
