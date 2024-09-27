@@ -180,6 +180,17 @@ The script ``create-auth-config.sh`` is not generally meant to be used directly 
 
 # Configuring BIG-IP HA groups
 
+BIG-IP HA groups allows configuring conditions in which perform a failover. Conditions used are for example when the BIG-IP is not able to reach an upstream gateway or when the the network interfaces are down. In this case, we are going to monitor the availability of CIS with the /ready endpoint, which is exposed with a NodePort Service by the deploy-cis.sh script. 
+
+In the BIG-IPs, we will configure a pool for each CIS using the IPs of more than one Kubernetes node address for resiliency. Tipically, it will be used the master nodes because these are less likely to be changed.
+
+The steps to configure this are:
+
+1. Create an HTTP monitor for CIS
+2. Create a pool for each CIS
+3. Create an HA group
+4. Assign the HA group to the traffic-group that CIS will manage
+
 # Uninstalling
 
 The three steps below remove everything that was installed in all clusters.
