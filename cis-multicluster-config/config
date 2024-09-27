@@ -1,0 +1,22 @@
+# Namespace where CIS is installed
+CIS_NS=f5bigipctlr
+# CIS version
+CIS_VERSION=v2.18.0
+# CIS NodePort health check
+CIS_NODEPORT=30000
+# BIG-IP credentials
+BIGIP_USER=admin
+BIGIP_PASS=OpenShiftMC
+# The alias used for each OpenShift cluster, index 0 and 1 are the clusters where CIS is installed
+CLUSTERS_ALIAS[0]=ocp1
+CLUSTERS_ALIAS[1]=ocp2
+CLUSTERS_ALIAS[2]=ocp3
+# The path the KUBECONFIG file for each cluster, the value is run with "eval". Login and CLUSTER_ALIAS variables can be used.
+KUBECONFIGS='$HOME/.kube/config.$CLUSTER_ALIAS'
+# The name of the context for each cluster. CLUSTER_ALIAS variable can be used.
+KUBECONTEXTS='default/api-${CLUSTER_ALIAS}-f5-udf-com:6443/f5admin'
+# login command
+KUBELOGINS='oc login -u f5admin -p f5admin'
+# Select if you want to install using the OpenShift operator or just the plain Deployment file
+INSTALL_TYPE=operator
+# INSTALL_TYPE=deployment
