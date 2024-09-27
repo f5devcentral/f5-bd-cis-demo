@@ -77,9 +77,9 @@ Remember to rename these files with the ``<CLUSTER_ALIAS>`` of the target cluste
 
 Once the above configurations are completed installing the whole deployment consists in three steps:
 
-- For each cluster, create the access that CIS will use.
+- Create the access that CIS will use for the clusters.
 
-  This creates a service account, API token, RBAC and a kubeconfig.
+  This script creates a service account, API token, RBAC and a kubeconfig for **all clusters** in a single run.
   
 ```
 $ ./create-all-auth-configs.sh 
@@ -125,9 +125,152 @@ clusterrolebinding.rbac.authorization.k8s.io/bigip-ctlr-clusterrole-binding crea
 clusterrole.rbac.authorization.k8s.io/cluster-admin added: "f5-bigip-ctlr-serviceaccount"
 secret/f5-bigip-ctlr-serviceaccount created
 ```
+- Deploy CIS in the first cluster
 
-The following scripts are meant to be used directly by the user:
+```
+$ ./deploy-cis.sh ocp1
+Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
+Login successful.
 
+You have access to 85 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+service/cis-health-nodeport created
+customresourcedefinition.apiextensions.k8s.io/virtualservers.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/tlsprofiles.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/transportservers.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/externaldnses.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/ingresslinks.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/policies.cis.f5.com created
+secret/bigip-login created
+configmap/global-cm.ocp1 created
+f5bigipctlr.cis.f5.com/f5bigipctlr created
+secret/kubeconfig.ocp1 created
+secret/kubeconfig.ocp2 created
+secret/kubeconfig.ocp3 created
+```
+- Deploy CIS in the second cluster
+
+```
+$ ./deploy-cis.sh ocp2
+Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
+Login successful.
+
+You have access to 82 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+service/cis-health-nodeport created
+customresourcedefinition.apiextensions.k8s.io/virtualservers.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/tlsprofiles.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/transportservers.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/externaldnses.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/ingresslinks.cis.f5.com created
+customresourcedefinition.apiextensions.k8s.io/policies.cis.f5.com created
+secret/bigip-login created
+configmap/global-cm.ocp2 created
+f5bigipctlr.cis.f5.com/f5bigipctlr created
+secret/kubeconfig.ocp1 created
+secret/kubeconfig.ocp2 created
+secret/kubeconfig.ocp3 created
+```
+
+Note that the deploy-cis.sh also installs the CIS CRDs.
+
+The script ``create-auth-config.sh`` is not generally meant to be used directly by the user and is instead used by the ``create-all-auth-configs.sh``.
 
 # Configuring BIG-IP HA groups
 
+# Uninstalling
+
+The three steps below remove everything that was installed in all clusters.
+
+- Undo the configs created by ``create-all-auth-configs.sh``
+
+```
+$./delete-all-auth-configs.sh 
+>>> Cluster ocp1
+Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
+Login successful.
+
+You have access to 85 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+serviceaccount "f5-bigip-ctlr-serviceaccount" deleted
+clusterrole.rbac.authorization.k8s.io "bigip-ctlr-clusterrole" deleted
+clusterrolebinding.rbac.authorization.k8s.io "bigip-ctlr-clusterrole-binding" deleted
+secret "kubeconfig.ocp1" deleted
+secret "kubeconfig.ocp2" deleted
+secret "kubeconfig.ocp3" deleted
+>>> Cluster ocp2
+Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
+Login successful.
+
+You have access to 82 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+serviceaccount "f5-bigip-ctlr-serviceaccount" deleted
+clusterrole.rbac.authorization.k8s.io "bigip-ctlr-clusterrole" deleted
+clusterrolebinding.rbac.authorization.k8s.io "bigip-ctlr-clusterrole-binding" deleted
+secret "kubeconfig.ocp1" deleted
+secret "kubeconfig.ocp2" deleted
+secret "kubeconfig.ocp3" deleted
+>>> Cluster ocp3
+Switched to context "default/api-ocp3-f5-udf-com:6443/f5admin".
+Login successful.
+
+You have access to 83 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+serviceaccount "f5-bigip-ctlr-serviceaccount" deleted
+clusterrole.rbac.authorization.k8s.io "bigip-ctlr-clusterrole" deleted
+clusterrolebinding.rbac.authorization.k8s.io "bigip-ctlr-clusterrole-binding" deleted
+```
+
+- Undo the CIS installation in the second cluster
+```
+$ ./undeploy-cis.sh ocp2
+Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
+Login successful.
+
+You have access to 82 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+f5bigipctlr.cis.f5.com "f5bigipctlr" deleted
+namespace "f5bigipctlr" deleted
+```
+- Undo the CIS installation in the first cluster
+```
+[cloud-user@ocp-provisioner cis-config]$ ./undeploy-cis.sh ocp1
+Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
+Login successful.
+
+You have access to 85 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+f5bigipctlr.cis.f5.com "f5bigipctlr" deleted
+namespace "f5bigipctlr" deleted
+```
+
+Note that the ``undeploy.sh`` script removes the namespace where the CIS instances where deployed.
+
+Note that by default, the ``undeploy.sh`` script doesn´t remove the CRDs. This is because removing the CRDs makes Kubernetes automatically remove any manifests (service configurations) created with these resources. If it is desired to remove the CRDs you can run the script with the ``delete-crds`` parameter. For example:
+
+```
+$ ./undeploy-cis.sh ocp2 delete-crds
+Switched to context "default/api-ocp2-f5-udf-com:6443/f5admin".
+Login successful.
+
+You have access to 81 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "default".
+f5bigipctlr.cis.f5.com "f5bigipctlr" deleted
+namespace "f5bigipctlr" deleted
+customresourcedefinition.apiextensions.k8s.io "virtualservers.cis.f5.com" deleted
+customresourcedefinition.apiextensions.k8s.io "tlsprofiles.cis.f5.com" deleted
+customresourcedefinition.apiextensions.k8s.io "transportservers.cis.f5.com" deleted
+customresourcedefinition.apiextensions.k8s.io "externaldnses.cis.f5.com" deleted
+customresourcedefinition.apiextensions.k8s.io "ingresslinks.cis.f5.com" deleted
+customresourcedefinition.apiextensions.k8s.io "policies.cis.f5.com" deleted
+```
+
+The HA-groups configuration needs to be removed manually.
