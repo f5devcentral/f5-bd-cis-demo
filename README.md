@@ -20,7 +20,7 @@ delete-demo.sh -----------> Undoes the changes of create-demo.sh
 delete-shards.sh ---------> Undoes the changes of create-shards.sh (should be called after delete-demo.sh)
 ```
 
-For multi-cluster demos, there is a bin folder which contains two useful scripts:
+For multi-cluster demos, there is a cis-multicluster-utils folder which contains two useful scripts used throrough in this repository:
 ```
 use-cluster.sh -----------> Used to switch the contexts of the different clusters
 run-cluster.sh -----------> Used to run a kubectl/oc command across all clusters defined in the CLUSTER_LIST environment variable 
