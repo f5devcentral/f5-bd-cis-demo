@@ -4,7 +4,7 @@ The scripts and information in this folder provide an opinionated way on how to 
 
 In this, it is recommended to use only one CIS instance per BIG-IP and rely in BIG-IP HA groups to provide redundancy.
 
-![alt text](https://raw.githubusercontent.com/f5devcentral/f5-bd-cis-demo/refs/heads/main/cis-multicluster-config/CIS-redundancy-with-hagroups.png "CIS redundancy with BIG-IP HA groups")
+![alt text](https://raw.githubusercontent.com/f5devcentral/f5-bd-cis-demo/refs/heads/main/cis-multicluster-config/images/CIS-redundancy-with-hagroups.png "CIS redundancy with BIG-IP HA groups")
 
 It is worth to remark that in this setup, CIS are configured as primary so services are automatically discovered in both clusters without requiring the use of extendedServiceReferences when using two clusters.
 
@@ -188,9 +188,12 @@ The steps to configure this are:
 
 1. Create an HTTP monitor for CIS
 2. Create a pool for each CIS
-3. Create an HA group
-4. Assign the HA group to the traffic-group that CIS will manage
-
+   ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/bigip_ha_groups_pools.png?raw=true "Configuration of the NodePort pools for CIS")
+4. Perform a BIG-IP config-sync
+5. Create an HA group in each BIG-IP independently
+6. Assign the HA group to the traffic-group that CIS will manage
+7. Perform a final BIG-IP config-sync
+   
 # Uninstalling
 
 The three steps below remove everything that was installed in all clusters.
