@@ -4,6 +4,8 @@ source config
 
 ### Templates
 
+echo "Creating non authentication configurations..."
+
 source templates/global-cm.cluster0.tmpl > global-cm.${CLUSTERS_ALIAS[0]}.yaml
 source templates/global-cm.cluster1.tmpl > global-cm.${CLUSTERS_ALIAS[1]}.yaml
 
