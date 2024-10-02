@@ -27,4 +27,5 @@ OPERATOR_NS=openshift-operators
 # BIGIP IP addresses where the AS3 API is exposed (either mgmt of self-IP, if exposed)
 BIGIP_IP[0]=10.1.1.7
 BIGIP_IP[1]=10.1.1.8
-
+# The default partition that will be used unless specified in the CRDs
+PARTITION_DEFAULT=mc-twotier
