@@ -4,7 +4,7 @@ The scripts and information in this folder provide an opinionated way on how to 
 
 In this, it is recommended to use only one CIS instance per BIG-IP and rely in BIG-IP HA groups to provide redundancy.
 
-![alt text](https://raw.githubusercontent.com/f5devcentral/f5-bd-cis-demo/refs/heads/main/cis-multicluster-config/CIS-redundancy-with-hagroups.png "CIS redundancy with BIG-IP HA groups")
+![alt text](https://raw.githubusercontent.com/f5devcentral/f5-bd-cis-demo/refs/heads/main/cis-multicluster-config/images/CIS-redundancy-with-hagroups.png "CIS redundancy with BIG-IP HA groups")
 
 It is worth to remark that in this setup, CIS are configured as primary so services are automatically discovered in both clusters without requiring the use of extendedServiceReferences when using two clusters.
 
@@ -180,17 +180,38 @@ The script ``create-auth-config.sh`` is not generally meant to be used directly 
 
 # Configuring BIG-IP HA groups
 
-BIG-IP HA groups allows configuring conditions in which perform a failover. Conditions used are for example when the BIG-IP is not able to reach an upstream gateway or when the the network interfaces are down. In this case, we are going to monitor the availability of CIS with the /ready endpoint, which is exposed with a NodePort Service by the deploy-cis.sh script. 
+BIG-IP HA groups allows configuring conditions in which perform a failover. Conditions are for example when the BIG-IP is not able to reach an upstream gateway or when the the network interfaces are down. In the case of this integration, we are going to monitor the availability of CIS with the /ready endpoint, which is exposed with a NodePort Service by the deploy-cis.sh script. 
 
-In the BIG-IPs, we will configure a pool for each CIS using the IPs of more than one Kubernetes node address for resiliency. Tipically, it will be used the master nodes because these are less likely to be changed.
+In the BIG-IPs, we will configure a pool for each CIS using the IPs of more than one Kubernetes node address for resiliency. Tipically, the pool members we will configure in the BIG-IP pools will be the master nodes because these are less likely to be changed. Using several pool members guarantee that in the case of node going down we still can properly monitor CIS properly.
 
 The steps to configure this are:
 
 1. Create an HTTP monitor for CIS
-2. Create a pool for each CIS
-3. Create an HA group
-4. Assign the HA group to the traffic-group that CIS will manage
 
+   ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/http_cis_monitor.png?raw=true "Configuration of the NodePort pools for CIS")
+   
+3. Create a pool for each CIS NodePort
+
+   ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/bigip_ha_groups_pools.png?raw=true "Configuration of the NodePort pools for CIS")
+   
+5. Perform a BIG-IP config-sync to the peer unit
+
+6. Create an HA group in each BIG-IP independently
+
+   Note that HA configuration in BIG-IP1 and BIG-IP2 monitor the CIS of ocp1 and ocp2 respectively
+   
+   Configuration in BIG-IP1 for CIS in the first cluster (ocp1)
+   ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/ha_group_bigip1.png?raw=true "HA group configuration for BIG-IP1 / first cluster")
+
+   Configuration in BIG-IP2 for CIS in the second cluster (ocp2)
+   ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/ha_group_bigip2.png?raw=true "HA group configuration for BIG-IP1 / first cluster")
+
+7. Assign the HA group to the traffic-group that CIS will manage
+
+   ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/traffic_group.png?raw=true "Assign the HA group to the traffic-group")
+   
+9. Perform a final BIG-IP config-sync
+   
 # Uninstalling
 
 The three steps below remove everything that was installed in all clusters.
