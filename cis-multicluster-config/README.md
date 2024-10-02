@@ -31,9 +31,11 @@ Edit the ``config`` file in this folder. The file contains comments describing e
 ```
 # Namespace where CIS is installed
 CIS_NS=f5bigipctlr
+# Can be active-active, active-standby, ratio. Standalone mode not supported by this scripts.
+CIS_MODE=active-active
 # CIS version
 CIS_VERSION=v2.18.0
-# CIS NodePort health check. This information will be used also when configuring BIG-IP HA-groups.
+# CIS NodePort health check
 CIS_NODEPORT=30000
 # BIG-IP credentials
 BIGIP_USER=admin
@@ -51,38 +53,36 @@ KUBELOGINS='oc login -u f5admin -p f5admin'
 # Select if you want to install using the OpenShift operator or just the plain Deployment file
 INSTALL_TYPE=operator
 # INSTALL_TYPE=deployment
+# Where the IF5BigIpCtlr operator manifests are. Only used if $INSTALL_TYPE is operator.
+OPERATOR_NS=openshift-operators
+# BIGIP IP addresses where the AS3 API is exposed (either mgmt of self-IP, if exposed)
+BIGIP_IP[0]=10.1.1.7
+BIGIP_IP[1]=10.1.1.8
+# The default partition that will be used unless specified in the CRDs
+PARTITION_DEFAULT=mc-twotier
 ```
-## Configuring the CIS Extended ConfigMaps
-
-CIS multicluster requires an Extended ConfigMap which contains the deployment topology. There is one of these ConfigMaps per CIS instance.
-
-Use the provided sample files ```global-cm.ocp1.yaml``` and ```global-cm.ocp2.yaml``` and modify the namespace, cluster alias names as approppriate, including the file names of the manifests.
-
-Note that the ``primaryEndPoint`` is not really used.
-
 ## Configuring CIS for its deployment
 ### CIS deployment with the CIS Operator (alternative)
 
-If using the CIS Operator, edit the files ``operator/f5bigipctlr.ocp1.yaml`` and ``operator/f5bigipctlr.ocp2.yaml`` modifying the desired parameters.
-
-Remember to rename these files with the ``<CLUSTER_ALIAS>`` of the target clusters.
+If using the CIS Operator, edit the files ``templates/f5bigipctlr.cluster0.yaml`` and ``templates/f5bigipctlr.cluster1.yaml`` modifying the desired parameters.
 
 ### CIS deployment with a Deployment manifest (alternative)
 
-If deploying with a plain Deployment manifest, edit the files ``deployment/f5-bigip-ctlr-deployment.ocp1.yaml`` and ``deployment/f5-bigip-ctlr-deployment.ocp2.yaml`` modifying the desired parameters.
-
-Remember to rename these files with the ``<CLUSTER_ALIAS>`` of the target clusters.
+If deploying with a plain Deployment manifest, edit the files ``templates/f5-bigip-ctlr-deployment.cluster0.yaml`` and ``templates/f5-bigip-ctlr-deployment.cluster1.yaml`` modifying the desired parameters.
 
 ## Running the scripts
 
-Once the above configurations are completed installing the whole deployment consists in three steps:
+Once the above pre-requisites are completed installing the whole deployment consists in three steps:
 
-- Create the access that CIS will use for the clusters.
+- Prepare the installation. This steps does:
 
-  This script creates a service account, API token, RBAC and a kubeconfig for **all clusters** in a single run.
+  - Renders the template files (global configmap and operand/deployment file)
+  - Creates the access that CIS will use for the clusters: service account, API token, RBAC and a kubeconfig for all clusters in a single run.
   
 ```
-$ ./create-all-auth-configs.sh 
+$ ./prepare-deployment.sh
+Creating non authentication configurations...
+Creating authentication configurations...
 >>> Cluster ocp1
 Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
 Login successful.
@@ -219,7 +219,7 @@ The three steps below remove everything that was installed in all clusters.
 - Undo the configs created by ``create-all-auth-configs.sh``
 
 ```
-$./delete-all-auth-configs.sh 
+$ ./undo-prepare-deployment.sh 
 >>> Cluster ocp1
 Switched to context "default/api-ocp1-f5-udf-com:6443/f5admin".
 Login successful.
