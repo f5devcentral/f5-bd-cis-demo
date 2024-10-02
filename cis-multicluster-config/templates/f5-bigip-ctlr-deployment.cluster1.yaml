@@ -36,8 +36,8 @@ spec:
                   key: password
           command: ["/app/bin/k8s-bigip-ctlr"]
           args: [
-              "--bigip-username=$(BIGIP_USERNAME)",
-              "--bigip-password=$(BIGIP_PASSWORD)",
+              "--bigip-username=\$(BIGIP_USERNAME)",
+              "--bigip-password=\$(BIGIP_PASSWORD)",
               "--bigip-url=${BIGIP_IP[1]}",
               "--bigip-partition=$PARTITION_DEFAULT",
               "--pool-member-type=nodeport",
