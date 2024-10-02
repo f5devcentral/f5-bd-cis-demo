@@ -1,0 +1,36 @@
+cat << EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: global-cm.${CLUSTERS_ALIAS[1]}
+    namespace: $CIS_NS
+    labels:
+        f5nr: "true"
+data:
+    extendedSpec: |
+      mode: $CIS_MODE
+      highAvailabilityCIS:
+        primaryEndPoint: http://donotuse:30000/health
+        probeInterval: 30
+        retryInterval: 3
+        primaryCluster:
+          clusterName: ${CLUSTERS_ALIAS[1]}
+          secret: $CIS_NS/kubeconfig.${CLUSTERS_ALIAS[1]}
+        secondaryCluster:
+          clusterName: ${CLUSTERS_ALIAS[0]}
+          secret: $CIS_NS/kubeconfig.${CLUSTERS_ALIAS[0]}
+EOF
+
+for i in "${!CLUSTERS_ALIAS[@]}" ; do
+
+	if [ $i -lt 2 ]; then 
+		continue
+	fi
+
+	# externalClustersConfig needed
+	echo "      externalClustersConfig:"
+	echo "      - clusterName: ${CLUSTERS_ALIAS[i]}"
+	echo "        secret: $CIS_NS/kubeconfig.${CLUSTERS_ALIAS[i]}"
+
+done
+

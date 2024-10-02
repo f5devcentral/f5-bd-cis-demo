@@ -1,0 +1,54 @@
+cat <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-bigip-ctlr-deployment
+spec:
+  # DO NOT INCREASE REPLICA COUNT
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-bigip1-ctlr-deployment
+  template:
+    metadata:
+      labels:
+        app: k8s-bigip1-ctlr-deployment
+    spec:
+      # Name of the Service Account bound to a Cluster Role with the required
+      # permissions
+      containers:
+        - name: k8s-bigip-ctlr
+          image: quay.io/f5networks/k8s-bigip-ctlr-devel:747c54aea334532b39bb611bd04d16036d8f6b05
+          env:
+            - name: BIGIP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  # Replace with the name of the Secret containing your login
+                  # credentials
+                  name: bigip-login
+                  key: username
+            - name: BIGIP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # Replace with the name of the Secret containing your login
+                  # credentials
+                  name: bigip-login
+                  key: password
+          command: ["/app/bin/k8s-bigip-ctlr"]
+          args: [
+              "--bigip-username=$(BIGIP_USERNAME)",
+              "--bigip-password=$(BIGIP_PASSWORD)",
+              "--bigip-url=${BIGIP_IP[0]}",
+              "--bigip-partition=$PARTITION_DEFAULT",
+              "--pool-member-type=nodeport",
+              "--share-nodes=true",
+              "--multi-cluster-mode=primary",
+              "--log-level=INFO",
+              "--insecure=true",
+              "--extended-spec-configmap=$CIS_NS/global-cm.${CLUSTERS_ALIAS[0]}",
+              "--custom-resource-mode=true",
+              "--as3-validation=true",
+              "--log-as3-response=true"
+          ]
+      serviceAccountName: f5-bigip-ctlr-serviceaccount
+EOF
