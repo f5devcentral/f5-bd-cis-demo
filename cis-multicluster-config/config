@@ -1,5 +1,7 @@
 # Namespace where CIS is installed
 CIS_NS=f5bigipctlr
+# Can be active-active, active-standby, ratio. Standalone mode not supported by this scripts.
+CIS_MODE=active-active
 # CIS version
 CIS_VERSION=v2.18.0
 # CIS NodePort health check
@@ -20,3 +22,9 @@ KUBELOGINS='oc login -u f5admin -p f5admin'
 # Select if you want to install using the OpenShift operator or just the plain Deployment file
 INSTALL_TYPE=operator
 # INSTALL_TYPE=deployment
+# Where the IF5BigIpCtlr operator manifests are. Only used if $INSTALL_TYPE is operator.
+OPERATOR_NS=openshift-operators
+# BIGIP IP addresses where the AS3 API is exposed (either mgmt of self-IP, if exposed)
+BIGIP_IP[0]=10.1.1.7
+BIGIP_IP[1]=10.1.1.8
+

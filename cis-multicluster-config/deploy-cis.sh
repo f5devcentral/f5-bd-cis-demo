@@ -39,9 +39,9 @@ kubectl create secret generic bigip-login --namespace ${CIS_NS} --from-literal=u
 kubectl apply -f global-cm.${CLUSTER_ALIAS}.yaml
 
 if [ $INSTALL_TYPE = "operator" ]; then
-	kubectl apply -f operator/f5bigipctlr.${CLUSTER_ALIAS}.yaml
+	kubectl apply -f f5bigipctlr.${CLUSTER_ALIAS}.yaml
 else
-	kubectl apply -f deployment/f5-bigip-ctlr-deployment.${CLUSTER_ALIAS}.yaml -n ${CIS_NS}
+	kubectl apply -f f5-bigip-ctlr-deployment.${CLUSTER_ALIAS}.yaml -n ${CIS_NS}
 fi
 
 for i in "${!CLUSTERS_ALIAS[@]}" ; do

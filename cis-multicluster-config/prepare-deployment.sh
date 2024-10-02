@@ -2,6 +2,23 @@
 
 source config
 
+### Templates
+
+source templates/global-cm.cluster0.tmpl > global-cm.${CLUSTERS_ALIAS[0]}.yaml
+source templates/global-cm.cluster1.tmpl > global-cm.${CLUSTERS_ALIAS[1]}.yaml
+
+if [ $INSTALL_TYPE = "operator" ]; then
+	source templates/f5bigipctlr.cluster0.tmpl > f5bigipctlr.${CLUSTERS_ALIAS[0]}.yaml
+        source templates/f5bigipctlr.cluster1.tmpl > f5bigipctlr.${CLUSTERS_ALIAS[1]}.yaml
+else
+	source templates/f5-bigip-ctlr-deployment.cluster0.yaml > f5-bigip-ctlr-deployment.${CLUSTERS_ALIAS[0]}.yaml
+        source templates/f5-bigip-ctlr-deployment.cluster1.yaml > f5-bigip-ctlr-deployment.${CLUSTERS_ALIAS[1]}.yaml
+fi
+
+### Authentication configuration
+
+echo "Creating authentication configurations..."
+
 for i in "${!CLUSTERS_ALIAS[@]}" ; do
 
 	CLUSTER_ALIAS=${CLUSTERS_ALIAS[$i]}
