@@ -16,6 +16,8 @@ CIS will be deployed in two clusters, as the image above shows. Each CIS will be
 
 ## Preparations
 
+- Install AS3 in the BIG-IPs
+- Optional, install the CIS Operator
 - Download this folder to the host where kubectl/oc commands can be run.
 - For each cluster, make a copy of the kubeconfig file used by the user performing the installation. 
 
