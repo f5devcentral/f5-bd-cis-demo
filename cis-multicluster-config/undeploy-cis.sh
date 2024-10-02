@@ -17,9 +17,9 @@ kubectl config use-context $(eval echo -n $KUBECONTEXTS)
 eval $KUBELOGINS
 
 if [ $INSTALL_TYPE = "operator" ]; then
-	kubectl delete -f operator/f5bigipctlr.${CLUSTER_ALIAS}.yaml
+	kubectl delete -f f5bigipctlr.${CLUSTER_ALIAS}.yaml
 else
-	kubectl delete -f deployment/f5-bigip-ctlr-deployment.${CLUSTER_ALIAS}.yaml -n ${CIS_NS}
+	kubectl delete -f f5-bigip-ctlr-deployment.${CLUSTER_ALIAS}.yaml -n ${CIS_NS}
 fi
 
 # The HA-group health Service is still in the namespace after removing the operand
