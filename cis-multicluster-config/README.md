@@ -192,9 +192,9 @@ The steps to configure this are:
 
    ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/http_cis_monitor.png?raw=true "Configuration of the NodePort pools for CIS")
    
-3. Create pools bigip1_bigip1_cis_healthcheck and bigip2_bigip1_cis_healthcheck using as members the master nodes of CLUSTERS_ALIAS[0] and CLUSTERS_ALIAS[1] respectively. Apply the HTTP monitor for CIS just created. These are shown as red in the next image.
+3. Create pools bigip1_bigip1_cis_healthcheck and bigip2_bigip1_cis_healthcheck using as members the master nodes of ocp1 and ocp2 respectively. Apply the HTTP monitor for CIS just created. These are shown as red in the next image.
    
-5. Create pools bigip1_bigip1_cis_nodecheck and bigip2_bigip1_cis_nodecheck using as members the master nodes of CLUSTERS_ALIAS[0] and CLUSTERS_ALIAS[1] respectively. Apply the gateway_icmp monitor. These are shown as blue in the next image.
+5. Create pools bigip1_bigip1_cis_nodecheck and bigip2_bigip1_cis_nodecheck using as members the master nodes of ocp1 and ocp2 respectively. Apply the gateway_icmp monitor. These are shown as blue in the next image.
 
    ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/bigip_ha_groups_pools.png?raw=true "Configuration of the NodePort pools for CIS")
    
@@ -215,6 +215,10 @@ The steps to configure this are:
    ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/traffic_group.png?raw=true "Assign the HA group to the traffic-group")
    
 9. Perform a final BIG-IP config-sync
+    
+11. Verify that the HA configuration works as expected by disabling the pool members with the forced down option.
+
+Note that one of the behaviours expected from this configuration is that if CIS are down for both BIG-IPs, then there is no failover.
    
 # Uninstalling
 
