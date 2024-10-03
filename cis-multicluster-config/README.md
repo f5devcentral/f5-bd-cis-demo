@@ -192,13 +192,15 @@ The steps to configure this are:
 
    ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/http_cis_monitor.png?raw=true "Configuration of the NodePort pools for CIS")
    
-3. Create a pool for each CIS NodePort
+3. Create pools bigip1_bigip1_cis_healthcheck and bigip2_bigip1_cis_healthcheck using as members the master nodes of CLUSTERS_ALIAS[0] and CLUSTERS_ALIAS[1] respectively. Apply the HTTP monitor for CIS just created. These are shown as red in the next image.
+   
+5. Create pools bigip1_bigip1_cis_nodecheck and bigip2_bigip1_cis_nodecheck using as members the master nodes of CLUSTERS_ALIAS[0] and CLUSTERS_ALIAS[1] respectively. Apply the gateway_icmp monitor. These are shown as blue in the next image.
 
    ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/bigip_ha_groups_pools.png?raw=true "Configuration of the NodePort pools for CIS")
    
-5. Perform a BIG-IP config-sync to the peer unit
+6. Perform a BIG-IP config-sync to the peer unit
 
-6. Create an HA group in each BIG-IP independently
+7. Create an HA group in each BIG-IP independently
 
    Note that HA configuration in BIG-IP1 and BIG-IP2 monitor the CIS of ocp1 and ocp2 respectively
    
@@ -208,7 +210,7 @@ The steps to configure this are:
    Configuration in BIG-IP2 for CIS in the second cluster (ocp2)
    ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/ha_group_bigip2.png?raw=true "HA group configuration for BIG-IP1 / first cluster")
 
-7. Assign the HA group to the traffic-group that CIS will manage
+8. Assign the HA group to the traffic-group that CIS will manage
 
    ![alt text](https://github.com/f5devcentral/f5-bd-cis-demo/blob/main/cis-multicluster-config/images/traffic_group.png?raw=true "Assign the HA group to the traffic-group")
    
