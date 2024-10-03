@@ -221,7 +221,9 @@ The steps to configure this are:
 Note that:
 
 a- one of the behaviours expected from this configuration is that if CIS are down for both BIG-IPs, then there is no failover. This is possible thanks the pool_bigipX_nodecheck pools and the Active bonus which is only taken into account when score is not 0 (hence the need of additional pools pool_bigipX_nodecheck).
+
 b- using an Active Bonus of 5, if the gateway_icmp monitor of pool_bigipX_nodecheck fails in all the members (master nodes) then the BIG-IP will failover quickly (because the gateway_timeout has a shorter timeout than the created HTTP monitor).
+
 c- alternatively, setting an Active Bonus of 15 will inhibit that the gateway_icmp to have an effect of inducing a failover because Active Bonus (15) would be higher than the weight of the pool_bigipX_nodecheck (10). This configuration still facilitates the behaviour (a). 
    
 # Uninstalling
