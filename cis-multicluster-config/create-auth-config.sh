@@ -1,24 +1,31 @@
 #!/bin/bash
 
 CIS_NS="$1"
-KUBECONFIG_FILE="$2"
-CIS_INSTALL="$3"
+KUBECONTEXT="$2"
+KUBECONFIG_FILE="$3"
+CIS_INSTALL="$4"
 
 if [ -z ${CIS_NS} ]; then
 
-        echo "It is needed to specify CIS namespace as argument, ie: $0 <namespace> <kubeconfig file> <cis-install|no-cis-install>"
+        echo "It is needed to specify CIS namespace as argument, ie: $0 <namespace> <kubecontext> <kubeconfig file> <cis-install|no-cis-install>"
+        exit 1
+fi
+
+if [ -z ${KUBECONTEXT} ]; then
+
+        echo "It is needed to specify the destination config file as argument, ie: $0 <namespace> <kubecontext> <kubeconfig file> <cis-install|no-cis-install>" 
         exit 1
 fi
 
 if [ -z ${KUBECONFIG_FILE} ]; then
 
-        echo "It is needed to specify the destination config file as argument, ie: $0 <namespace> <kubeconfig file> <cis-install|no-cis-install>"
+        echo "It is needed to specify the destination config file as argument, ie: $0 <namespace> <kubecontext> <kubeconfig file> <cis-install|no-cis-install>"
         exit 1
 fi
 
 if [ -z ${CIS_INSTALL} ]; then
 
-	echo "It is needed to specify if the auth configuration is for a cluster with CIS installed or a remote cluster, ie: $0 <namespace> <kubeconfig file> <cis-install|no-cis-install>"
+	echo "It is needed to specify if the auth configuration is for a cluster with CIS installed or a remote cluster, ie: $0 <namespace> <kubecontext> <kubeconfig file> <cis-install|no-cis-install>"
 	exit 1
 fi
 
@@ -34,7 +41,7 @@ elif [ ${CIS_INSTALL} = "no-cis-install" ]; then
 
 else
 
-        echo "It is needed to specify if the auth configuration is for a cluster with CIS installed or a remote cluster, ie: $0 <namespace> <kubeconfig file> <cis-install|no-cis-install>"
+        echo "It is needed to specify if the auth configuration is for a cluster with CIS installed or a remote cluster, ie: $0 <namespace> <kubecontext> <kubeconfig file> <cis-install|no-cis-install>"
         exit 1
 
 fi
@@ -60,14 +67,9 @@ eval oc >/dev/null 2>&1 && oc adm policy add-cluster-role-to-user cluster-admin 
 kubectl apply -f kubeconfig-secret-token.yaml -n ${CIS_NS}
 
 USER_TOKEN_VALUE=$(kubectl -n ${CIS_NS} get secret f5-bigip-ctlr-serviceaccount -o=jsonpath='{.data.token}' | base64 -d )
-CURRENT_CONTEXT=$(kubectl config current-context)
-CURRENT_CLUSTER=$(kubectl config view --raw -o=go-template='{{range .contexts}}{{if eq .name "'''${CURRENT_CONTEXT}'''"}}{{ index .context "cluster" }}{{end}}{{end}}')
-CLUSTER_SERVER=$(kubectl config view --raw -o=go-template='{{range .clusters}}{{if eq .name "'''${CURRENT_CLUSTER}'''"}}{{ .cluster.server }}{{end}}{{ end }}')
-CLUSTER_CA=$(kubectl config view --raw -o=go-template='{{range .clusters}}{{if eq .name "'''${CURRENT_CLUSTER}'''"}}"{{with index .cluster "certificate-authority-data" }}{{.}}{{end}}"{{ end }}{{ end }}')
-
-if [ -n ${CLUSTER_CA} ]; then
-	CLUSTER_CA=$(kubectl config view --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}')
-fi
+CLUSTER=$(kubectl config view --raw -o=go-template='{{range .contexts}}{{if eq .name "'''${KUBECONTEXT}'''"}}{{ index .context "cluster" }}{{end}}{{end}}')
+SERVER=$(kubectl config view --raw -o=go-template='{{range .clusters}}{{if eq .name "'''${CLUSTER}'''"}}{{ .cluster.server }}{{end}}{{ end }}')
+CA=$(kubectl config view --raw -o=go-template='{{range .clusters}}{{if eq .name "'''${CLUSTER}'''"}}"{{with index .cluster "certificate-authority-data" }}{{.}}{{end}}"{{ end }}{{ end }}')
 
 cat << EOF > ${KUBECONFIG_FILE}
 apiVersion: v1
@@ -76,13 +78,13 @@ current-context: bigip-ctlr-context
 contexts:
 - name: bigip-ctlr-context
   context:
-    cluster: ${CURRENT_CLUSTER}
+    cluster: ${CLUSTER}
     user: f5-bigip-ctlr-serviceaccount
 clusters:
-- name: ${CURRENT_CLUSTER}
+- name: ${CLUSTER}
   cluster:
-    certificate-authority-data: ${CLUSTER_CA}
-    server: ${CLUSTER_SERVER}
+    certificate-authority-data: ${CA}
+    server: ${SERVER}
 users:
 - name: f5-bigip-ctlr-serviceaccount
   user:

@@ -28,7 +28,7 @@ for i in "${!CLUSTERS_ALIAS[@]}" ; do
         echo ">>> Cluster ${CLUSTER_ALIAS}"
 
 	export KUBECONFIG=$(eval echo -n $KUBECONFIGS)
-	kubectl config use-context $(eval echo -n $KUBECONTEXTS)
+	kubectl config use-context ${KUBECONTEXT}
         eval $KUBELOGINS
 
 	kubectl create ns ${CIS_NS} --dry-run=client -o yaml | kubectl apply -f -
@@ -36,9 +36,9 @@ for i in "${!CLUSTERS_ALIAS[@]}" ; do
 	if [ $i -lt 2 ]; then # The clusters where CIS is installed
 
 		kubectl label ns ${CIS_NS} f5bigipctlr="true" --overwrite
-		./create-auth-config.sh ${CIS_NS} kubeconfig.${CLUSTER_ALIAS}.yaml cis-install
+		./create-auth-config.sh ${CIS_NS} ${KUBECONTEXT} kubeconfig.${CLUSTER_ALIAS}.yaml cis-install
 	else
-		./create-auth-config.sh ${CIS_NS} kubeconfig.${CLUSTER_ALIAS}.yaml no-cis-install
+		./create-auth-config.sh ${CIS_NS} ${KUBECONTEXT} kubeconfig.${CLUSTER_ALIAS}.yaml no-cis-install
 	fi
 done
 
