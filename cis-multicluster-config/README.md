@@ -26,6 +26,12 @@ CIS will be deployed in two clusters, as the image above shows. Each CIS will be
   
 - Make sure that the kubeconfig files contain the ``certificate-authority-data`` for the cluster.
 
+Overall the following files need to be prepared:
+
+- Kubeconfigs
+- `templates/f5bigipctlr.cluster0.yaml`` and ``templates/f5bigipctlr.cluster1.yaml``  (Operator install) or ``templates/f5-bigip-ctlr-deployment.cluster0.yaml`` and ``templates/f5-bigip-ctlr-deployment.cluster1.yaml`` (deployment file install)
+- config file
+
 ## Configuring the scripts
 
 Edit the ``config`` file in this folder. The file contains comments describing each field. See next an example. Please note that these scripts can be used with or without the CIS Operator.
