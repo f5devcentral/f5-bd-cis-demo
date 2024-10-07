@@ -28,6 +28,7 @@ for i in "${!CLUSTERS_ALIAS[@]}" ; do
         echo ">>> Cluster ${CLUSTER_ALIAS}"
 
 	export KUBECONFIG=$(eval echo -n $KUBECONFIGS)
+ 	KUBECONTEXT=$( eval echo -n ${KUBECONTEXTS} )
 	kubectl config use-context ${KUBECONTEXT}
         eval $KUBELOGINS
 
