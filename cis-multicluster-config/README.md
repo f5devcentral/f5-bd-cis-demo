@@ -66,7 +66,7 @@ PARTITION_DEFAULT=mc-twotier
 ## Configuring CIS for its deployment
 ### CIS deployment with the CIS Operator (alternative)
 
-If using the CIS Operator, edit the files ``templates/f5bigipctlr.cluster0.yaml`` and ``templates/f5bigipctlr.cluster1.yaml`` modifying the desired parameters.
+If using the CIS Operator, edit the files ``templates/f5bigipctlr.cluster0.tmpl`` and ``templates/f5bigipctlr.cluster1.tmpl`` modifying the desired parameters.
 
 ### CIS deployment with a Deployment manifest (alternative)
 
