@@ -69,7 +69,7 @@ kubectl apply -f kubeconfig-secret-token.yaml -n ${CIS_NS}
 USER_TOKEN_VALUE=$(kubectl -n ${CIS_NS} get secret f5-bigip-ctlr-serviceaccount -o=jsonpath='{.data.token}' | base64 -d )
 CLUSTER=$(kubectl config view --raw -o=go-template='{{range .contexts}}{{if eq .name "'''${KUBECONTEXT}'''"}}{{ index .context "cluster" }}{{end}}{{end}}')
 SERVER=$(kubectl config view --raw -o=go-template='{{range .clusters}}{{if eq .name "'''${CLUSTER}'''"}}{{ .cluster.server }}{{end}}{{ end }}')
-CA=$(kubectl config view --raw -o=go-template='{{range .clusters}}{{if eq .name "'''${CLUSTER}'''"}}"{{with index .cluster "certificate-authority-data" }}{{.}}{{end}}"{{ end }}{{ end }}')
+CA=$(kubectl config view  --minify --flatten -o=go-template='{{range .clusters}}{{if eq .name "'''${CLUSTER}'''"}}"{{with index .cluster "certificate-authority-data" }}{{.}}{{end}}"{{ end }}{{ end }}')
 
 cat << EOF > ${KUBECONFIG_FILE}
 apiVersion: v1
