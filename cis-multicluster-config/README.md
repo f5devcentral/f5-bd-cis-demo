@@ -24,7 +24,7 @@ CIS will be deployed in two clusters, as the image above shows. Each CIS will be
   This separate kubeconfigs will guarantee that while running the kubernetes commands the k8s context doesn´t change.
   Name the kubeconfig files like ``config.<CLUSTER_ALIAS>`` where ``<CLUSTER_ALIAS>`` will be used through the configuration and run of the scripts. 
   
-- Make sure that the kubeconfig files contain the ``certificate-authority-data`` for the cluster.
+- Make sure that the kubeconfig files contain the ``certificate-authority-data`` or ``certificate-authority`` fields for the cluster.
 
 ## Configuring the scripts
 
