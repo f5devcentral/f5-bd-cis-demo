@@ -14,6 +14,8 @@ export KUBECONFIG=$(eval echo -n $KUBECONFIGS)
 kubectl config use-context $(eval echo -n $KUBECONTEXTS)
 eval $KUBELOGINS
 
+kubectl create ns ${CIS_NS} --dry-run=client -o yaml | kubectl apply -f -
+
 cat << EOF | kubectl apply -f -
 apiVersion: v1
 kind: Service
