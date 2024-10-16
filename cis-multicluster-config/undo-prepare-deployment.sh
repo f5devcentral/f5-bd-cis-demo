@@ -3,15 +3,16 @@
 source config
 
 ### Templates
-
-rm -f global-cm.${CLUSTERS_ALIAS[0]}.yaml
-rm -f global-cm.${CLUSTERS_ALIAS[1]}.yaml
-
-rm -f f5bigipctlr.${CLUSTERS_ALIAS[0]}.yaml
-rm -f f5bigipctlr.${CLUSTERS_ALIAS[1]}.yaml
-
-rm -f f5-bigip-ctlr-deployment.${CLUSTERS_ALIAS[0]}.yaml
-rm -f f5-bigip-ctlr-deployment.${CLUSTERS_ALIAS[1]}.yaml
+#
+# rm -f global-cm.${CLUSTERS_ALIAS[0]}.yaml
+# rm -f global-cm.${CLUSTERS_ALIAS[1]}.yaml
+#
+# rm -f f5bigipctlr.${CLUSTERS_ALIAS[0]}.yaml
+# rm -f f5bigipctlr.${CLUSTERS_ALIAS[1]}.yaml
+# 
+# rm -f f5-bigip-ctlr-deployment.${CLUSTERS_ALIAS[0]}.yaml
+# rm -f f5-bigip-ctlr-deployment.${CLUSTERS_ALIAS[1]}.yaml
+#
 
 ### Authentication configuration
 
