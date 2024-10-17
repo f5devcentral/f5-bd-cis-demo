@@ -19,6 +19,7 @@ spec:
     extended-spec-configmap: $CIS_NS/global-cm.${CLUSTERS_ALIAS[1]}
     pool-member-type: nodeport
     share-nodes: true
+    namespace: openshift-ingress
   bigip_login_secret: bigip-login
   image:
     pullPolicy: IfNotPresent
