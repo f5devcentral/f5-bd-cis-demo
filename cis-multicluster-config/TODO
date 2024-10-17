@@ -1,0 +1,1 @@
+- Create sanity check script (or maybe better a code in prepare-deployment.sh) to validate the config file and the generated configs
